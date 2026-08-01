@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ToScout — Know before it breaks you</title>
+<meta name="description" content="ToScout watches your vendors' pricing, terms of service, and API deprecations — Stripe, OpenAI, AWS, and 50+ more — and alerts you in plain English before changes cost you.">
+<style>
+  :root {
+    --bg: #0b0e14; --panel: #12161f; --panel2: #171c27; --line: #232a38;
+    --ink: #e8ecf3; --muted: #98a2b3; --accent: #f59e0b; --accent2: #fbbf24;
+    --good: #34d399; --bad: #f87171;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
+  .tos { color: var(--accent); font-weight: 800; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
+  .logo { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
+  nav a.cta { background: var(--accent); color: #1a1200; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; }
+  .hero { padding: 72px 0 40px; text-align: center; }
+  .hero h1 { font-size: clamp(30px, 5.5vw, 52px); line-height: 1.12; letter-spacing: -.03em; font-weight: 800; }
+  .hero p.sub { color: var(--muted); font-size: clamp(16px, 2.4vw, 19px); max-width: 640px; margin: 20px auto 0; }
+  .badge { display: inline-block; border: 1px solid var(--line); color: var(--muted); font-size: 13px; border-radius: 999px; padding: 5px 14px; margin-bottom: 22px; background: var(--panel); }
+  form.capture { display: flex; gap: 10px; justify-content: center; margin: 32px auto 10px; max-width: 460px; flex-wrap: wrap; }
+  form.capture input {
+    flex: 1; min-width: 220px; background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 13px 16px; color: var(--ink); font-size: 16px;
+  }
+  form.capture button {
+    background: var(--accent); border: none; border-radius: 10px; padding: 13px 22px;
+    font-weight: 800; font-size: 16px; color: #1a1200; cursor: pointer;
+  }
+  form.capture button:hover { background: var(--accent2); }
+  .tiny { color: var(--muted); font-size: 13px; }
+  .alert-demo { max-width: 620px; margin: 56px auto 0; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .alert-demo .bar { background: var(--panel2); padding: 10px 16px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); }
+  .alert-demo .body { padding: 18px 20px; }
+  .alert-demo .sev { display: inline-block; background: #3a2f10; color: var(--accent2); font-size: 12px; font-weight: 700; border-radius: 6px; padding: 2px 9px; margin-bottom: 10px; }
+  .alert-demo h3 { font-size: 16px; margin-bottom: 6px; }
+  .alert-demo p { color: var(--muted); font-size: 14px; }
+  section { padding: 64px 0 8px; }
+  section h2 { font-size: clamp(24px, 3.6vw, 32px); letter-spacing: -.02em; text-align: center; margin-bottom: 14px; }
+  section p.lead { color: var(--muted); text-align: center; max-width: 640px; margin: 0 auto 40px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
+  .card .n { color: var(--accent); font-weight: 800; font-size: 14px; }
+  .card h3 { font-size: 17px; margin: 8px 0 8px; }
+  .card p { color: var(--muted); font-size: 14.5px; }
+  .pain { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 30px; margin-top: 8px; }
+  .pain blockquote { font-size: 17px; border-left: 3px solid var(--accent); padding-left: 18px; }
+  .pain .who { color: var(--muted); font-size: 14px; margin-top: 12px; }
+  .vendors { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
+  .vendors span { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 5px 13px; font-size: 13px; }
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; max-width: 640px; margin: 0 auto; }
+  .price { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px; text-align: center; }
+  .price.hot { border-color: var(--accent); }
+  .price .amt { font-size: 34px; font-weight: 800; }
+  .price .amt small { font-size: 14px; color: var(--muted); font-weight: 500; }
+  .price ul { list-style: none; padding: 14px 0 0; color: var(--muted); font-size: 14.5px; }
+  .price li { padding: 4px 0; }
+  .founding { text-align: center; background: linear-gradient(135deg, #1c1710, #171c27); border: 1px solid var(--accent); border-radius: 16px; padding: 34px 26px; margin-top: 26px; }
+  footer { padding: 56px 0 36px; text-align: center; color: var(--muted); font-size: 13.5px; }
+  footer .logo { font-size: 16px; margin-bottom: 8px; }
+  @media (prefers-color-scheme: light) { /* deliberately dark-only: devtool audience */ }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <div class="logo"><span class="tos">ToS</span>cout</div>
+    <a class="cta" href="#signup">Get early access</a>
+  </nav>
+
+  <div class="hero">
+    <div class="badge">🔭 Early access — founding members get 50% off for life</div>
+    <h1>Your vendors change their pricing, terms&nbsp;&amp;&nbsp;APIs quietly.<br>Find out loudly.</h1>
+    <p class="sub">ToScout watches the platforms your product depends on — Stripe, OpenAI, AWS, Twilio, the app stores — and sends you plain-English alerts when their pricing, terms of service, limits, or APIs change. Before it costs you.</p>
+
+    <form class="capture" id="signup" action="FORM_ENDPOINT_HERE" method="POST">
+      <input type="email" name="email" placeholder="you@yourstartup.com" required>
+      <button type="submit">Scout my stack →</button>
+    </form>
+    <p class="tiny">Connect your GitHub repo later — we auto-detect your vendors. No spam, ever.</p>
+
+    <div class="alert-demo">
+      <div class="bar">📬 Example alert — what lands in your inbox</div>
+      <div class="body">
+        <span class="sev">HEADS-UP · affects you</span>
+        <h3>Stripe updated its pricing page</h3>
+        <p>Cross-border card fees increased from 1.5% → 1.9% starting next month. Based on your stack (Stripe + international customers), this likely raises your processing costs. <u>See the exact diff →</u></p>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <h2>The last founders to find out paid the most</h2>
+    <p class="lead">Platform changes killed apps that did everything else right.</p>
+    <div class="pain">
+      <blockquote>Reddit's API pricing change gave Apollo a $20M/year bill overnight. Apollo — and a whole generation of Reddit apps — shut down within a month. Meta ended its Events API without notice. Google Maps' price hike broke thousands of apps' unit economics in one announcement.</blockquote>
+      <p class="who">Your stack is 20–30 companies deep. Each one can change your costs, your legal exposure, or your product — with a blog post you'll never see. ToScout reads them all, every day, so you don't have to.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <p class="lead">Set up once. Involvement after that: reading one email.</p>
+    <div class="cards">
+      <div class="card"><div class="n">01</div><h3>Connect your repo</h3><p>Sign in with GitHub (read-only). ToScout reads your dependencies and instantly maps your vendor stack — Stripe, OpenAI, Vercel, Resend, whatever you're built on.</p></div>
+      <div class="card"><div class="n">02</div><h3>We watch everything</h3><p>Pricing pages, terms of service, API changelogs and deprecation feeds — checked daily for every vendor in your stack.</p></div>
+      <div class="card"><div class="n">03</div><h3>Plain-English alerts</h3><p>No raw diffs. AI reads every change and tells you what changed, how severe it is, and whether it affects <em>you</em> — plus a monthly "state of your stack" report.</p></div>
+    </div>
+    <p class="lead" style="margin-top:36px; margin-bottom:12px;">Watching the platforms indie SaaS actually runs on:</p>
+    <div class="vendors">
+      <span>Stripe</span><span>OpenAI</span><span>Anthropic</span><span>AWS</span><span>Vercel</span><span>Supabase</span><span>Twilio</span><span>Resend</span><span>Cloudflare</span><span>App Store</span><span>Google Play</span><span>Shopify</span><span>Paddle</span><span>+ 40 more</span>
+    </div>
+  </section>
+
+  <section>
+    <h2>Pricing</h2>
+    <p class="lead">Cheaper than one surprise.</p>
+    <div class="price-grid">
+      <div class="price">
+        <h3>Free</h3>
+        <div class="amt">$0</div>
+        <ul><li>Watch 3 vendors</li><li>Email alerts</li><li>Repo auto-detect</li></ul>
+      </div>
+      <div class="price hot">
+        <h3>Pro</h3>
+        <div class="amt">$19<small>/mo</small></div>
+        <ul><li>Your whole stack, unlimited</li><li>Severity + "affects you" analysis</li><li>Monthly state-of-stack report</li><li>Slack alerts</li></ul>
+      </div>
+    </div>
+    <div class="founding">
+      <h2 style="margin-bottom:8px;">Founding members: 50% off. Forever.</h2>
+      <p class="lead" style="margin-bottom:18px;">Join the early-access list now and lock in Pro at $9.50/mo for life when we launch.</p>
+      <form class="capture" action="FORM_ENDPOINT_HERE" method="POST">
+        <input type="email" name="email" placeholder="you@yourstartup.com" required>
+        <button type="submit">Lock in 50% off →</button>
+      </form>
+    </div>
+  </section>
+
+  <footer>
+    <div class="logo"><span class="tos">ToS</span>cout</div>
+    <p>Know before it breaks you.</p>
+    <p style="margin-top:10px;">ToScout summarizes vendor changes for awareness — it isn't legal advice.<br>© 2026 ToScout</p>
+  </footer>
+</div>
+</body>
+</html>
