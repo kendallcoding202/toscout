@@ -13,9 +13,15 @@ that matches the built-in narrative and dreams of that tiny group — is the ste
 behind it. Everyone sells step 4 (spread the word) and step 1 (make the thing). Nobody sells
 the listening that step 3 requires.
 
-**Positioning:** Voice-of-customer research, automated and kept current. NOT social listening
+**Positioning:** Voice-of-customer research, delivered as a document. NOT social listening
 (enterprise, brand-monitoring, wrong buyer), NOT keyword alerts (commodity, free options
-exist), NOT a content generator (the opposite of the thesis).
+exist), NOT a content generator (the opposite of the thesis), and **NOT Reddit-dependent** —
+see below, that last one is now the load-bearing decision.
+
+> **Read `SCOUTVALIDATION.md` § Lane 3 before this document.** GummySearch — the closest
+> competitor, ~135,000 users, profitable — shut down because it could not obtain a Reddit
+> commercial licence. That finding rewrote this plan: the business is a **service first**,
+> and nothing automated touches Reddit.
 
 ---
 
@@ -59,19 +65,34 @@ product itself doesn't do it for you.
 
 ---
 
+## The two paths, and which one is live
+
+| | Service (live now) | SaaS (conditional) |
+|---|---|---|
+| What sells | One research card, $300–500 | $49/mo maintained card |
+| Reddit exposure | None — a human reads public pages | Fatal, unless Reddit-free |
+| Demand shape | Bursty, which is normal for a deliverable | Needs recurring, which is unproven |
+| Cost to test | Ten afternoons | Ten weekends |
+| Status | **Start here** | Only if ≥3 of the first ten ask for a refresh |
+
+The SaaS is not cancelled, it's gated. Phase −1 is the gate.
+
 ## Sequence: hand-run → smoke test → MVP → launch
 
 ### Phase −1 — Ten by hand (before any product code)
 
-Produce ten Narrative Cards manually. You, reading forums for an afternoon each. Free, for
-real copywriters and founders. Then ask exactly one question: *"what would you pay for this
-every month?"*
+**Full runbook in `PHASEMINUS1.md`** — where the buyer is, the outreach message, the card
+format, pricing, and how to score the results. Summary:
 
-- Learns what actually belongs in the card, which no amount of planning will tell you
+Produce ten Narrative Cards manually. You, reading forums for an afternoon each. Send them
+free and unsolicited to people who post publicly about client work, then ask one question:
+would you pay for this, and roughly what?
+
+- Learns what belongs in the card, which no amount of planning will tell you
 - Costs ten afternoons instead of ten weekends
 - Produces the first ten pieces of public content (see the engine)
-- **Go/no-go:** fewer than three people name a monthly number → this is a one-off product or
-  a services business, not SaaS. Reprice or kill. Don't build the pipeline to find out.
+- **Go/no-go:** nobody pays $300–500 for a card → it will not sell at $49/mo either. Kill it.
+  Three or more ask about a monthly refresh → there's a product under the service, build it.
 
 ### Phase 0 — Smoke test (week 1–2)
 
@@ -91,7 +112,7 @@ every month?"*
    seek, where's the tension), phrases flagged as absent from the audience's vocabulary, and
    the audience's own phrasing quoted beside them. Works with a self-written card, which is
    what makes it a viable free product.
-2. **Audience setup.** One sentence in → proposed sources out (Reddit, Discourse forums,
+2. **Audience setup.** One sentence in → proposed sources out (Discourse forums,
    Hacker News, Stack Exchange, YouTube comments, review sites, RSS). Human confirms and
    edits. Never auto-watch without confirmation; a bad source poisons the card.
 3. **The listening pipeline.** Scheduled fetch → dedupe → relevance gate → extraction with
@@ -106,8 +127,9 @@ every month?"*
 (vanity), multi-audience comparison, anything resembling a dashboard.
 
 **Shared listening economics:** each source is fetched once globally and fanned out to every
-subscriber watching it. If 200 customers all watch r/freelance, we fetch it once. Marginal
-cost per customer approaches zero, and the normalized utterance corpus compounds.
+subscriber watching it. Marginal cost per customer approaches zero and the normalized
+utterance corpus compounds — but only for sources whose terms permit it, which is the entire
+argument for staying off Reddit.
 
 ### Phase 2 — Launch
 
@@ -139,14 +161,24 @@ Non-negotiable. Each one is load-bearing.
 
 ## Pricing
 
+**Now (service):**
+
+| | Price | What |
+|---|---|---|
+| One card | $300–500 | A single research document, delivered in ~2 days |
+| Card + Red Pen pass | $750 | Plus a critique of their draft against it |
+| Monthly refresh | $150/mo | Only when they ask. Never lead with it |
+
+**Later (SaaS), only if Phase −1 says so:**
+
 | | Price | What |
 |---|---|---|
 | Red Pen | Free | Unlimited critiques against a card you write yourself |
-| Scout | $49/mo | One audience, up to 12 sources, maintained card, weekly digest, export |
-| Practice | $99/mo | Three audiences, faster cadence, Slack, client-ready branded export |
+| Scout | $49/mo | One audience, maintained card, weekly digest, export |
+| Practice | $99/mo | Three audiences, faster cadence, Slack, branded export |
 
-Priced for the consultant, not the hobbyist. $19 was the founder price and it undersells a
-billable deliverable — a card that saves four hours on a $5k project is not a $19 purchase.
+Priced for the consultant, not the hobbyist. A card that saves four hours on a $5k project is
+not a $19 purchase.
 
 ## Architecture (boring on purpose)
 
@@ -154,11 +186,14 @@ Carried over from this repo's previous occupant, which had this part right.
 
 - **App:** Next.js on Vercel — marketing and product in one.
 - **Source adapters:** one per source type, each yielding a normalized
-  `Utterance { source, permalink, author_hash, text, posted_at }`. Reddit (official API),
-  Discourse (public JSON), Hacker News (Algolia API, free), Stack Exchange (API, free),
-  YouTube Data API, RSS. **No source may exceed ~40% of a card** — the previous product in
-  this repo existed to warn people about platform dependency, so shipping a Reddit-only tool
-  here would be self-parody.
+  `Utterance { source, source_type, permalink, author_hash, text, posted_at, query }`.
+  Built and tested: Hacker News (Algolia, free, no key), Stack Exchange (free API),
+  Discourse (public JSON — thousands of niche professional forums run on it), RSS, and a
+  `manual` adapter for quotes you gathered by hand. Later: YouTube Data API, review sites.
+  See `tools/gather.py`; run `--why-no-reddit` for the missing adapter.
+- **No Reddit adapter, ever.** Not a hedge — a survival condition. Reddit is a source you read
+  yourself in a browser and paste into a `manual` entry. Automating it requires a commercial
+  licence the incumbent could not get at 135,000 users.
 - **Pipeline:** fetch → dedupe → cheap relevance gate (keyword/embedding) → Claude extracts
   signals with a *required* quote and permalink per signal → cluster → card version → digest.
   The model only sees candidates that pass the gate, which is where the cost control lives.
@@ -186,6 +221,12 @@ Why this is the whole channel and not a tactic:
 Second channel: Red Pen as the free, shareable roast — people post their own critique in a way
 nobody ever posts a research report.
 
+Third, and time-limited: **the orphaned 135,000.** GummySearch's users lose their tool on
+1 Dec 2026 and are searching for a replacement now. Being visibly useful on "what do I use
+instead" between now and then is the cheapest distribution this project will ever get — and
+the honest pitch writes itself, because the replacement they need is one that can't be killed
+the same way.
+
 And note what publishing weekly for years actually is: step 5. Godin's own answer to
 distribution happens to be this product's output.
 
@@ -195,27 +236,36 @@ Full weighting lives in `SCOUTVALIDATION.md`. The three that matter:
 
 | Risk | Mitigation |
 |---|---|
-| Research is a sprint, not a subscription | Phase −1 answers this in two weeks for free; if true, reprice as one-off or services |
-| Source platform pricing/ToS changes | Source-agnostic adapters, no source above ~40% of a card |
-| Output reads generic → month-three churn | The receipts rule, enforced in the schema, not in the prompt |
+| The non-Reddit sources are too thin to carry a card | **Untested and now the make-or-break question.** Build card #1 with zero Reddit and look at it honestly |
+| Research is a sprint, not a subscription | Largely defused by selling a per-project deliverable, where bursty demand is the normal shape |
+| Reddit licensing | Settled: nothing automated touches Reddit |
+| Output reads generic → churn | The receipts rule, enforced in the schema, not in the prompt |
 
 ## Repo layout
 
 ```
 toscout/
 ├── README.md
-├── SCOUTPLAN.md            ← this file
-├── SCOUTVALIDATION.md      ← the sweep, competitors, kill criteria
-├── index.html              ← smoke-test landing page (GitHub Pages)
-├── CNAME                   ← toscout.com (add when DNS is pointed)
-└── app/                    ← Next.js app (Phase 1)
+├── SCOUTPLAN.md              ← this file
+├── SCOUTVALIDATION.md        ← the sweep, competitors, kill criteria
+├── PHASEMINUS1.md            ← the runbook: targets, outreach, card format, pricing
+├── index.html                ← smoke-test landing page (GitHub Pages)
+├── tools/
+│   ├── gather.py             ← collects utterances; no Reddit adapter, on purpose
+│   └── tests/test_gather.py  ← 25 tests, fixture-based, no network
+├── cards/
+│   └── example.sources.json  ← copy this per audience
+├── CNAME                     ← toscout.com (add when DNS is pointed)
+└── app/                      ← Next.js app (only if Phase −1 passes)
 ```
 
 ## Immediate next actions
 
-1. Verify the five rows in `SCOUTVALIDATION.md` § "Verify before spending a weekend"
-2. Hand-produce card #1 for a real copywriter — an afternoon, no code
-3. Drop a Formspree endpoint into `index.html` (replace `FORM_ENDPOINT_HERE`)
-4. Point toscout.com DNS at GitHub Pages, add `CNAME`
-5. Publish the first hand-run card publicly, then post it where copywriters gather
-6. Repeat 2 and 5 nine more times before writing a line of product code
+1. Read `gummysearch.com/final-chapter/` — this plan rests on secondary reporting of it
+2. `python3 tools/gather.py --config cards/example.sources.json --out out/test` — if the
+   non-Reddit sources come back thin, stop here; that's the answer
+3. Hand-produce card #1 and send it, per `PHASEMINUS1.md`
+4. Drop a Formspree endpoint into `index.html` (replace `FORM_ENDPOINT_HERE`)
+5. Point toscout.com DNS at GitHub Pages, add `CNAME`
+6. Publish card #1 publicly, into the GummySearch-replacement conversation
+7. Repeat 3 and 6 nine more times before writing a line of product code
