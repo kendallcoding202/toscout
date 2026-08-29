@@ -23,13 +23,15 @@ run these sessions today, most likely on a canvas.
 
 | Who | Where | Why they fit |
 |---|---|---|
-| **Michal Eisik** | michaleisik.com/90-minute-positioning-workshop | **Best single match found.** Sells a *90-minute positioning workshop* for B2B tech. Someone productizing a short session is exactly who benefits from software that runs one |
-| **Inflection Studio** | inflectionstudio.co/positioning-consultant | Positions explicitly as a B2B SaaS positioning consultant |
-| **The Simplifier** | thesimplifier.io | Positioning and messaging for B2B tech and SaaS |
+| **Michal Eisik** | michaleisik.com/90-minute-positioning-workshop | **Best single match found.** Sells a *90-minute positioning workshop* and delivers a *1–3 page Positioning & Messaging Brief* — precisely the session this runs and the artifact it outputs. Ex-agency copywriter of 10+ years, so treat her as the expert (see `OUTREACH.md`) |
+| **Inflection Studio** | inflectionstudio.co/positioning-consultant | Sells a *5-day positioning sprint*, a 4-week GTM Foundation Sprint, and ongoing PMM from ~£5k/mo. Productized, so the session is a fixed thing software could support |
+| **Fletch PMM** | fletchpmm.com | *Two-week homepage messaging sprint*, reportedly 500+ B2B SaaS companies, publishes frameworks publicly. Higher tier, and the most likely to share it |
+| **The Simplifier** | thesimplifier.io/services/brand-message-strategy | Brand message strategy: audit, narrative, differentiation |
 | **SellSuccessfully** | sellsuccessfully.io/services/saas-positioning | SaaS positioning as a named service line |
 | **Positioning Expert** | positioningexpert.com | Whole business is this |
 | **Genesys Growth** | genesysgrowth.com | Consultancy; also publishes comparison content, so they're reachable and they care about the category |
-| **Fletch PMM** | Search "Fletch PMM" | B2B positioning and messaging, well known in PMM circles |
+| **Abigail Zilinskaite** | "Abigail's Positioning Practice" (Substack) | Writes publicly about positioning as a practice — least verified, check first |
+| **Diane Wiredu** | Search her name + messaging | Messaging consultant who speaks publicly about positioning — least verified, check first |
 | **PitchKitchen** | pitchkitchen.com | Positioning and messaging for B2B |
 
 ## Tier B — Maven instructors teaching this

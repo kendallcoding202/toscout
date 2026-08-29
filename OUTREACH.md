@@ -39,11 +39,26 @@ useless.
 
 ---
 
-## The message
+## Two messages, depending on who they are
 
-Do not ask for their time. Do not describe the product. Run the tool on **their own homepage's
-audience sentence** and send them what it said. The rejection *is* the pitch — it's specific to
-them, which is why it gets a reply.
+**The rule: never critique a professional's copy.** A conversion copywriter with ten years'
+experience does not need a script to tell them their homepage is vague, and sending one reads
+as arrogant from a stranger. Split the list:
+
+| They are | The move |
+|---|---|
+| A founder, an in-house PMM, an agency generalist | Run the tool on their homepage line, send the rejection |
+| **A positioning or messaging practitioner** | Don't critique them. Show them the tool and ask them to judge it |
+
+The second group is the one that buys. Treat them as the expert they are — the ask is their
+professional opinion, which is flattering, cheap to give, and gets replies.
+
+---
+
+### Message A — for practitioners (the buyers)
+
+Do not ask for their time. Do not describe the product. Reference the specific thing they
+sell, show the tool doing its one trick, and ask one blunt question.
 
 > **Subject: your homepage says "ambitious teams"**
 >
@@ -64,6 +79,92 @@ them, which is why it gets a reply.
 
 **Why this works:** you're doing them a favour before asking for anything, the observation is
 about *them*, and the ask is one question they can answer in four words.
+
+---
+
+### Ready to send
+
+Verify each person's current offering before sending — these were assembled from search
+results and the details may have moved.
+
+#### Michal Eisik — send this one first
+
+Sells a *90-minute positioning workshop* and delivers a *1–3 page Positioning & Messaging
+Brief*. That is precisely the session this software runs and the artifact it outputs. Best
+match on the list.
+
+> **Subject: the 90-minute positioning workshop, as software**
+>
+> Hi Michal — you sell a 90-minute positioning workshop and hand back a 1–3 page positioning
+> brief. I built a free tool that runs that kind of session and produces that kind of
+> document, and I'd rather hear from someone who does this for a living than keep guessing.
+>
+> It's called Pick One. Ten minutes, no signup, runs entirely in the browser. Its one trick is
+> that it refuses vague answers and says why. Type "B2B SaaS and tech companies" and it comes
+> back with:
+>
+> > *Nothing here says what makes them different from everyone else with that job title. Give
+> > them a moment, a constraint, or something they actually do.*
+>
+> — and it won't let you continue until the sentence excludes somebody.
+>
+> [link]
+>
+> One question, and a blunt answer is the useful one: would you ever put this in front of a
+> client before a workshop, or would it get in the way? If it gets in the way I'd like to know
+> exactly where.
+>
+> — [you]
+>
+> No pitch behind this, there's nothing to buy.
+
+Note the example input is generic on purpose. Do not quote her own homepage back at her.
+
+#### Inflection Studio
+
+Sells a *5-day positioning sprint*, plus a 4-week GTM Foundation Sprint and ongoing PMM from
+about £5k/month.
+
+> **Subject: day one of the 5-day positioning sprint**
+>
+> Hi — you run a 5-day positioning sprint. I built a free tool for what I assume is the ugliest
+> part of day one: getting a team to name one audience and admit what they're giving up by
+> dropping the others.
+>
+> It refuses vague answers and won't advance until the sentence excludes somebody. Ten minutes,
+> no signup: [link]
+>
+> Would this save you an hour on day one, or is the argument the part clients need to have with
+> a human in the room? Genuinely asking — if it's the latter, that's the answer.
+
+#### Fletch PMM
+
+Runs a *two-week homepage messaging sprint*, reportedly 500+ B2B SaaS companies, and publishes
+positioning frameworks publicly. Higher tier, and the most likely to share it if they like it.
+
+> **Subject: a tool that argues with audience sentences**
+>
+> Hi — you've run homepage messaging sprints for hundreds of B2B SaaS companies, so you've
+> probably seen every version of "we help ambitious teams" there is.
+>
+> I built a free tool that refuses those sentences and says specifically what's wrong with them.
+> No AI, just pattern matching on the ways vagueness shows up. Ten minutes, no signup: [link]
+>
+> One question: what's the vaguest audience sentence it should catch and doesn't? I'd rather
+> find the holes from someone who's seen a few hundred of them.
+
+That last question is worth stealing generally — asking an expert to break your thing gets a
+better response rate than asking them to like it.
+
+#### Also worth writing to
+
+- **The Simplifier** — brand message strategy for B2B SaaS
+- **Abigail Zilinskaite** — writes "Abigail's Positioning Practice" publicly
+- **Diane Wiredu** — messaging consultant, talks publicly about positioning
+- **PitchKitchen**, **Positioning Expert**, **SellSuccessfully**, **Genesys Growth**
+
+The last four came from SEO listicles and are the least verified on the list. Check the site
+before writing.
 
 **Variations that also work**
 - If they've publicly posted an audience statement, use that instead of their homepage.
