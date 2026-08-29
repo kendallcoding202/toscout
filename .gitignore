@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+
+# Next.js app (Phase 1)
+.next/
+out/
+.vercel/
+
+# secrets
+.env
+.env.*
+!.env.example
