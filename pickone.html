@@ -76,6 +76,11 @@
   .verdict ul{margin:8px 0 0;padding-left:20px}
   .verdict li{margin-bottom:5px}
   .verdict .head{font-weight:700;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+  .verdict .share{margin-top:12px;background:transparent;border:1px solid var(--rule);color:var(--muted);
+    font-size:13px;font-weight:600;padding:6px 12px;border-radius:6px}
+  .verdict.bad .share{border-color:rgba(178,56,44,.35);color:var(--red)}
+  .verdict.bad .share:hover{background:var(--red);color:#fff;border-color:var(--red)}
+  .verdict.good .share:hover{background:var(--ink);color:var(--paper);border-color:var(--ink)}
   .verdict.bad .head{color:var(--red)}
   .verdict.good .head{color:var(--green)}
 
@@ -408,6 +413,26 @@
         var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
       });
     div.appendChild(ul);
+
+    /* The rejection is the most shareable thing this tool produces, so make it
+       one click. Still local — the clipboard is the user's, nothing is sent. */
+    var share = document.createElement("button");
+    share.className = "share";
+    share.textContent = res.pass ? "Copy this" : "Copy this rejection";
+    share.addEventListener("click", function () {
+      var lines = res.pass
+        ? ['It finally accepted my audience:', '', '"' + $("sentence").value.trim() + '"', '',
+           'Pick One argues with your audience sentence until it actually excludes somebody.']
+        : ['I typed my audience into Pick One:', '',
+           '"' + $("sentence").value.trim() + '"', '', 'It refused, and told me why:', ''];
+      if (!res.pass) {
+        res.issues.forEach(function (i) { lines.push("· " + i.message); });
+        lines.push('', 'It will not let you continue until the sentence excludes somebody.');
+      }
+      copyText(lines.join("\n"), "Copied — paste it wherever you like");
+    });
+    div.appendChild(share);
+
     el.innerHTML = ""; el.appendChild(div);
   }
 
@@ -506,21 +531,25 @@
 
   $("finish").addEventListener("click", function () { renderCard(); show(6); });
 
-  $("copy").addEventListener("click", function () {
-    var text = markdown();
+  function copyText(text, msg) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
-        function () { toast("Copied as Markdown"); },
-        function () { fallbackCopy(text); }
+        function () { toast(msg); },
+        function () { fallbackCopy(text, msg); }
       );
-    } else { fallbackCopy(text); }
+    } else { fallbackCopy(text, msg); }
+  }
+
+  $("copy").addEventListener("click", function () {
+    copyText(markdown(), "Copied as Markdown");
   });
-  function fallbackCopy(text) {
+
+  function fallbackCopy(text, msg) {
     var ta = document.createElement("textarea");
     ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
     document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); toast("Copied as Markdown"); }
-    catch (e) { toast("Copy failed — select the card and copy manually"); }
+    try { document.execCommand("copy"); toast(msg || "Copied"); }
+    catch (e) { toast("Copy failed — select the text and copy manually"); }
     document.body.removeChild(ta);
   }
   $("print").addEventListener("click", function () { window.print(); });

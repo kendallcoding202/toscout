@@ -114,7 +114,8 @@ Deliberately almost nothing.
 
 1. **Pick One is the distribution.** A free tool that argues with you is shareable in a way a
    landing page never is. The thing people post is the screenshot of it rejecting their
-   sentence.
+   sentence — and every verdict has a **Copy this** button so that's one click, still entirely
+   local. Full runbook in `OUTREACH.md`.
 2. **Go to the consultants.** They run these sessions on Miro boards today. Show five of them
    the tool and watch whether they finish it — that's simultaneously the sales call and the
    test.

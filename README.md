@@ -28,6 +28,7 @@ Or just open `pickone.html` in a browser. No build step, no dependencies, no ser
 | `POSITIONINGPLAN.md` | What ships, product principles, pricing, distribution |
 | `pickone.html` | The working tool |
 | `tools/vague.js` | Vagueness detection — no AI, just heuristics |
+| `OUTREACH.md` | Who to talk to first, exactly, and the message to send |
 | `index.html` | Landing page |
 
 ## Tests
