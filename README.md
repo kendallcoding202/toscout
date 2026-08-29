@@ -29,6 +29,7 @@ Or just open `pickone.html` in a browser. No build step, no dependencies, no ser
 | `pickone.html` | The working tool |
 | `tools/vague.js` | Vagueness detection — no AI, just heuristics |
 | `OUTREACH.md` | Who to talk to first, exactly, and the message to send |
+| `PROSPECTS.md` | A starter list of named, unverified leads to work through |
 | `index.html` | Landing page |
 
 ## Tests
