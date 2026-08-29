@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pick One — decide who you're not for</title>
+<meta name="description" content="A free tool with one job: make you narrow to a single audience and write down what you're giving up. No signup, nothing leaves your browser.">
+<style>
+  :root {
+    --paper:#faf7f1; --card:#fffdf9; --rule:#e2dacb; --rule2:#efe8db;
+    --ink:#1c1a16; --muted:#6d6558; --red:#b2382c; --red-soft:#fbeeec;
+    --green:#3f6b42; --green-soft:#eef4ee;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);line-height:1.6;padding-bottom:80px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  a{color:var(--red)}
+  header{padding:26px 0 14px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+  .logo{font-family:var(--serif);font-size:21px;font-weight:700}
+  .logo .dot{color:var(--red)}
+  .privacy{font-family:var(--mono);font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+
+  .rail{display:flex;gap:6px;margin:18px 0 30px}
+  .rail div{flex:1;height:3px;background:var(--rule);border-radius:2px}
+  .rail div.on{background:var(--red)}
+  .rail div.done{background:var(--ink)}
+
+  h1{font-family:var(--serif);font-size:clamp(26px,4.6vw,38px);line-height:1.15;letter-spacing:-.02em;margin-bottom:12px}
+  h2{font-family:var(--serif);font-size:clamp(22px,3.6vw,30px);line-height:1.2;letter-spacing:-.02em;margin-bottom:10px}
+  p.lead{color:var(--muted);margin-bottom:24px;font-size:16.5px}
+  .step-n{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--red);margin-bottom:10px}
+
+  textarea,input[type=text]{width:100%;background:var(--card);border:1px solid var(--rule);border-radius:8px;
+    padding:12px 14px;color:var(--ink);font-size:16px;font-family:inherit;line-height:1.5}
+  textarea:focus,input[type=text]:focus{outline:2px solid var(--red);outline-offset:-1px;border-color:var(--red)}
+  textarea{min-height:130px;resize:vertical}
+  label{display:block;font-weight:600;margin-bottom:6px;font-size:15px}
+  .hint{color:var(--muted);font-size:14px;margin-bottom:16px}
+
+  button{font-family:inherit;font-size:15px;font-weight:600;border-radius:7px;padding:11px 20px;cursor:pointer;border:1px solid transparent}
+  .primary{background:var(--red);color:#fff}
+  .primary:hover{background:#8f2c22}
+  .primary:disabled{background:var(--rule);color:var(--muted);cursor:not-allowed}
+  .ghost{background:transparent;color:var(--muted);border-color:var(--rule)}
+  .ghost:hover{color:var(--ink);border-color:var(--muted)}
+  .actions{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;align-items:center}
+
+  .cand{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:16px 18px;margin-bottom:12px}
+  .cand.out{opacity:.5}
+  .cand h3{font-family:var(--serif);font-size:18px;margin-bottom:12px}
+  .q{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:7px 0;border-top:1px solid var(--rule2);flex-wrap:wrap}
+  .q:first-of-type{border-top:none}
+  .q span{font-size:14.5px;color:var(--muted);flex:1;min-width:200px}
+  .toggle{display:flex;gap:0;border:1px solid var(--rule);border-radius:6px;overflow:hidden;flex-shrink:0}
+  .toggle button{border:none;border-radius:0;background:var(--card);color:var(--muted);padding:6px 13px;font-size:13.5px;font-weight:600}
+  .toggle button.sel{background:var(--ink);color:var(--paper)}
+  .toggle button.sel.warn{background:var(--red);color:#fff}
+  .q input[type=text]{max-width:230px;padding:7px 10px;font-size:14px}
+  .score{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:12px;padding-top:10px;border-top:1px solid var(--rule2)}
+
+  .cut-row{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:15px 17px;margin-bottom:12px}
+  .cut-row.kept{border-color:var(--ink)}
+  .cut-row .body{flex:1}
+  .cut-row h3{font-family:var(--serif);font-size:17px;margin-bottom:4px}
+  .cut-row .meta{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .cut-row .give{margin-top:10px}
+  .cut-row .give input{font-size:14px;padding:8px 11px}
+  .keepbtn{flex-shrink:0}
+
+  .verdict{border-radius:9px;padding:15px 17px;margin-top:14px;font-size:14.5px}
+  .verdict.bad{background:var(--red-soft);border:1px solid rgba(178,56,44,.25)}
+  .verdict.good{background:var(--green-soft);border:1px solid rgba(63,107,66,.3)}
+  .verdict ul{margin:8px 0 0;padding-left:20px}
+  .verdict li{margin-bottom:5px}
+  .verdict .head{font-weight:700;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
+  .verdict.bad .head{color:var(--red)}
+  .verdict.good .head{color:var(--green)}
+
+  .card-out{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:26px 28px;margin-top:8px}
+  .card-out .sec{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin:22px 0 7px}
+  .card-out .sec:first-child{margin-top:0}
+  .card-out .big{font-family:var(--serif);font-size:22px;line-height:1.35}
+  .card-out p{font-family:var(--serif);font-size:17px;line-height:1.45}
+  .card-out .gave{border-left:2px solid var(--rule);padding-left:14px;margin-top:6px}
+  .card-out .gave div{color:var(--muted);font-size:15px;margin-bottom:7px}
+  .stamp{margin-top:26px;padding-top:16px;border-top:1px solid var(--rule2);font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.05em}
+  footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);color:var(--muted);font-size:13.5px}
+  .hidden{display:none}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
+    padding:11px 20px;border-radius:7px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:10}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">Pick One<span class="dot">.</span></div>
+    <div class="privacy">Nothing leaves your browser</div>
+  </header>
+
+  <div class="rail" id="rail"></div>
+
+  <!-- ---------------------------------------------------------------- 1 -->
+  <section id="s1">
+    <div class="step-n">Step 1 of 5 — the dump</div>
+    <h1>Who do you think you serve?</h1>
+    <p class="lead">All of them. Every audience you've ever told yourself you're for, including
+    the ones you'd be embarrassed to say out loud. One per line. Be greedy here — the whole
+    point of what follows is taking things away, and you can't subtract from a short list.</p>
+    <textarea id="dump" placeholder="freelance illustrators&#10;design agencies&#10;marketing teams at startups&#10;anyone who needs a logo"></textarea>
+    <p class="hint" id="dumpHint">At least three. If you can only name one, you haven't been honest yet.</p>
+    <div class="actions"><button class="primary" id="to2" disabled>Next — reality check</button></div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- 2 -->
+  <section id="s2" class="hidden">
+    <div class="step-n">Step 2 of 5 — the reality check</div>
+    <h2>Which of these are real?</h2>
+    <p class="lead">Not which are attractive. Which ones you have actual evidence for. Answer
+    fast and answer honestly — nobody sees this, and lying to yourself here costs you a year.</p>
+    <div id="cands"></div>
+    <div class="actions">
+      <button class="primary" id="to3">Next — the cut</button>
+      <button class="ghost" id="back2">Back</button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- 3 -->
+  <section id="s3" class="hidden">
+    <div class="step-n">Step 3 of 5 — the cut</div>
+    <h2>Keep one. Bury the rest.</h2>
+    <p class="lead">Ranked by the evidence you just gave, not by which you like most. Choose the
+    one you're keeping — then write what you're giving up with each of the others. Not "nothing."
+    Something real, or the decision won't hold in three weeks when it gets hard.</p>
+    <div id="cuts"></div>
+    <div class="actions">
+      <button class="primary" id="to4" disabled>Next — say it precisely</button>
+      <button class="ghost" id="back3">Back</button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- 4 -->
+  <section id="s4" class="hidden">
+    <div class="step-n">Step 4 of 5 — the gauntlet</div>
+    <h2>Now say it so it excludes someone.</h2>
+    <p class="lead">A job title isn't an audience. A moment is. Rewrite your survivor as a
+    sentence that describes a specific person at a specific point in their life — and keep
+    rewriting until this page stops arguing with you.</p>
+    <label for="sentence">The audience</label>
+    <input type="text" id="sentence" placeholder="freelance illustrators who just went full-time">
+    <div id="verdict"></div>
+    <div class="actions">
+      <button class="primary" id="to5" disabled>Next — the consequences</button>
+      <button class="ghost" id="back4">Back</button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- 5 -->
+  <section id="s5" class="hidden">
+    <div class="step-n">Step 5 of 5 — the consequences</div>
+    <h2>Three questions you can't skip.</h2>
+    <p class="lead">Picking an audience is only half of it. These three are what make it
+    positioning rather than a preference.</p>
+
+    <label for="excl">Who is this deliberately not for?</label>
+    <div class="hint">Name them. If nobody is turned away, nothing has been decided.</div>
+    <input type="text" id="excl" placeholder="agencies with an in-house design team">
+    <div id="exclVerdict"></div>
+
+    <label for="belief" style="margin-top:22px">What do they believe that most people don't?</label>
+    <div class="hint">The worldview you're joining, not one you have to install.</div>
+    <input type="text" id="belief" placeholder="that charging properly is a skill, not a personality trait">
+
+    <label for="before" style="margin-top:22px">The person before</label>
+    <input type="text" id="before" placeholder="undercharging and quietly resentful about it">
+    <label for="after" style="margin-top:14px">The person after</label>
+    <input type="text" id="after" placeholder="quoting a number without flinching">
+
+    <div class="actions">
+      <button class="primary" id="finish" disabled>Write the card</button>
+      <button class="ghost" id="back5">Back</button>
+    </div>
+  </section>
+
+  <!-- ---------------------------------------------------------------- out -->
+  <section id="out" class="hidden">
+    <div class="step-n">Your position card</div>
+    <h2>This is the decision.</h2>
+    <p class="lead">Put it somewhere you'll see it. Everything you write from here gets judged
+    against this sentence — and the test is whether the people you excluded would find it dull.</p>
+    <div class="card-out" id="card"></div>
+    <div class="actions">
+      <button class="primary" id="copy">Copy as Markdown</button>
+      <button class="ghost" id="print">Print</button>
+      <button class="ghost" id="restart">Start over</button>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Pick One</strong> — everything stays in your browser's local storage. No account,
+    no server, nothing sent anywhere.</p>
+    <p style="margin-top:8px">The five-step framing behind this owes a debt to Seth Godin's
+    <em>This Is Marketing</em>. The questions and the arguing are ours.</p>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="tools/vague.js"></script>
+<script>
+(function () {
+  "use strict";
+  var KEY = "pickone.v1";
+  var state = { step: 1, candidates: [], keptId: null, sentence: "",
+                excl: "", belief: "", before: "", after: "" };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function load() {
+    try {
+      var raw = localStorage.getItem(KEY);
+      if (raw) state = Object.assign(state, JSON.parse(raw));
+    } catch (e) {}
+  }
+
+  function toast(msg) {
+    var t = $("toast"); t.textContent = msg; t.classList.add("show");
+    setTimeout(function () { t.classList.remove("show"); }, 1800);
+  }
+
+  /* ---------------------------------------------------------- navigation */
+  var SECTIONS = ["s1", "s2", "s3", "s4", "s5", "out"];
+
+  function show(step) {
+    state.step = step; save();
+    SECTIONS.forEach(function (id, i) {
+      $(id).classList.toggle("hidden", i !== step - 1);
+    });
+    var rail = $("rail"); rail.innerHTML = "";
+    for (var i = 1; i <= 5; i++) {
+      var d = document.createElement("div");
+      if (i < step) d.className = "done"; else if (i === step) d.className = "on";
+      rail.appendChild(d);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  /* ------------------------------------------------------------- step 1 */
+  function parseDump() {
+    return $("dump").value.split("\n").map(function (s) { return s.trim(); })
+      .filter(Boolean).slice(0, 12);
+  }
+  function syncDump() {
+    var n = parseDump().length;
+    $("to2").disabled = n < 3;
+    $("dumpHint").textContent = n < 3
+      ? "At least three (" + n + " so far). If you can only name one, you haven't been honest yet."
+      : n + " candidates. Good — now we take them away.";
+  }
+  $("dump").addEventListener("input", syncDump);
+
+  $("to2").addEventListener("click", function () {
+    var names = parseDump();
+    var existing = {};
+    state.candidates.forEach(function (c) { existing[c.name] = c; });
+    state.candidates = names.map(function (name, i) {
+      return existing[name] || { id: "c" + i + "_" + name.length, name: name,
+                                 talked: null, named: "", pays: null, giveUp: "" };
+    });
+    save(); renderCandidates(); show(2);
+  });
+
+  /* ------------------------------------------------------------- step 2 */
+  var QUESTIONS = [
+    { key: "talked", label: "Have you spoken with five of them in the last 90 days?",
+      opts: [["yes", "Yes"], ["no", "No"]], warnOn: "no" },
+    { key: "pays", label: "Would they pay today, or only after you build more?",
+      opts: [["today", "Today"], ["later", "Later"]], warnOn: "later" },
+  ];
+
+  function scoreOf(c) {
+    var s = 0;
+    if (c.talked === "yes") s += 2;
+    if ((c.named || "").trim().length > 1) s += 2;
+    if (c.pays === "today") s += 2;
+    return s;
+  }
+  function verdictFor(s) {
+    if (s >= 5) return "Evidence, not hope";
+    if (s >= 3) return "Half real";
+    if (s >= 1) return "Mostly hope";
+    return "No evidence at all";
+  }
+
+  function renderCandidates() {
+    var box = $("cands"); box.innerHTML = "";
+    state.candidates.forEach(function (c) {
+      var el = document.createElement("div");
+      el.className = "cand";
+      var h = document.createElement("h3"); h.textContent = c.name; el.appendChild(h);
+
+      QUESTIONS.forEach(function (q) {
+        var row = document.createElement("div"); row.className = "q";
+        var lab = document.createElement("span"); lab.textContent = q.label; row.appendChild(lab);
+        var tg = document.createElement("div"); tg.className = "toggle";
+        q.opts.forEach(function (o) {
+          var b = document.createElement("button");
+          b.textContent = o[1];
+          if (c[q.key] === o[0]) b.className = "sel" + (o[0] === q.warnOn ? " warn" : "");
+          b.addEventListener("click", function () {
+            c[q.key] = o[0]; save(); renderCandidates();
+          });
+          tg.appendChild(b);
+        });
+        row.appendChild(tg); el.appendChild(row);
+      });
+
+      var row = document.createElement("div"); row.className = "q";
+      var lab = document.createElement("span");
+      lab.textContent = "Name one of them. Right now, from memory.";
+      row.appendChild(lab);
+      var inp = document.createElement("input");
+      inp.type = "text"; inp.value = c.named || ""; inp.placeholder = "a real name";
+      inp.addEventListener("input", function () {
+        c.named = inp.value; save();
+        sc.textContent = "Evidence score " + scoreOf(c) + "/6 — " + verdictFor(scoreOf(c));
+      });
+      row.appendChild(inp); el.appendChild(row);
+
+      var sc = document.createElement("div"); sc.className = "score";
+      sc.textContent = "Evidence score " + scoreOf(c) + "/6 — " + verdictFor(scoreOf(c));
+      el.appendChild(sc);
+
+      box.appendChild(el);
+    });
+  }
+
+  $("to3").addEventListener("click", function () { renderCuts(); show(3); });
+  $("back2").addEventListener("click", function () { show(1); });
+
+  /* ------------------------------------------------------------- step 3 */
+  function renderCuts() {
+    var sorted = state.candidates.slice().sort(function (a, b) { return scoreOf(b) - scoreOf(a); });
+    var box = $("cuts"); box.innerHTML = "";
+    sorted.forEach(function (c) {
+      var kept = state.keptId === c.id;
+      var el = document.createElement("div");
+      el.className = "cut-row" + (kept ? " kept" : "");
+
+      var body = document.createElement("div"); body.className = "body";
+      var h = document.createElement("h3"); h.textContent = c.name; body.appendChild(h);
+      var m = document.createElement("div"); m.className = "meta";
+      m.textContent = "Evidence " + scoreOf(c) + "/6 · " + verdictFor(scoreOf(c));
+      body.appendChild(m);
+
+      if (state.keptId && !kept) {
+        var give = document.createElement("div"); give.className = "give";
+        var gi = document.createElement("input");
+        gi.type = "text"; gi.value = c.giveUp || "";
+        gi.placeholder = "What are you giving up by letting this one go?";
+        gi.addEventListener("input", function () { c.giveUp = gi.value; save(); syncCut(); });
+        give.appendChild(gi); body.appendChild(give);
+      }
+      el.appendChild(body);
+
+      var btn = document.createElement("button");
+      btn.className = "keepbtn " + (kept ? "primary" : "ghost");
+      btn.textContent = kept ? "Kept" : "Keep this one";
+      btn.addEventListener("click", function () {
+        state.keptId = c.id; save(); renderCuts();
+      });
+      el.appendChild(btn);
+      box.appendChild(el);
+    });
+    syncCut();
+  }
+
+  function syncCut() {
+    var others = state.candidates.filter(function (c) { return c.id !== state.keptId; });
+    var allGiven = others.every(function (c) { return (c.giveUp || "").trim().length > 2; });
+    $("to3") && ($("to3").disabled = false);
+    $("to4").disabled = !state.keptId || !allGiven;
+  }
+
+  $("to4").addEventListener("click", function () {
+    var kept = state.candidates.filter(function (c) { return c.id === state.keptId; })[0];
+    if (kept && !state.sentence) { state.sentence = kept.name; $("sentence").value = kept.name; }
+    checkSentence(); show(4);
+  });
+  $("back3").addEventListener("click", function () { show(2); });
+
+  /* ------------------------------------------------------------- step 4 */
+  function renderVerdict(el, res) {
+    if (!res.issues.length && !res.strengths.length) { el.innerHTML = ""; return; }
+    var div = document.createElement("div");
+    div.className = "verdict " + (res.pass ? "good" : "bad");
+    var head = document.createElement("div"); head.className = "head";
+    head.textContent = res.pass ? "This one excludes people" : "Still too broad";
+    div.appendChild(head);
+    var ul = document.createElement("ul");
+    (res.pass ? res.strengths : res.issues.map(function (i) { return i.message; }))
+      .forEach(function (t) {
+        var li = document.createElement("li"); li.textContent = t; ul.appendChild(li);
+      });
+    div.appendChild(ul);
+    el.innerHTML = ""; el.appendChild(div);
+  }
+
+  function checkSentence() {
+    var res = window.checkAudience($("sentence").value);
+    renderVerdict($("verdict"), res);
+    $("to5").disabled = !res.pass;
+    state.sentence = $("sentence").value; save();
+  }
+  $("sentence").addEventListener("input", checkSentence);
+  $("to5").addEventListener("click", function () { show(5); syncFinal(); });
+  $("back4").addEventListener("click", function () { show(3); });
+
+  /* ------------------------------------------------------------- step 5 */
+  function syncFinal() {
+    ["excl", "belief", "before", "after"].forEach(function (k) { state[k] = $(k).value; });
+    save();
+    var ex = window.checkExclusion($("excl").value);
+    var box = $("exclVerdict");
+    if (!$("excl").value.trim()) { box.innerHTML = ""; }
+    else {
+      var div = document.createElement("div");
+      div.className = "verdict " + (ex.pass ? "good" : "bad");
+      var head = document.createElement("div"); head.className = "head";
+      head.textContent = ex.pass ? "Somebody is being turned away" : "Not an exclusion yet";
+      div.appendChild(head);
+      if (!ex.pass) {
+        var ul = document.createElement("ul");
+        var li = document.createElement("li"); li.textContent = ex.message;
+        ul.appendChild(li); div.appendChild(ul);
+      }
+      box.innerHTML = ""; box.appendChild(div);
+    }
+    var filled = ["belief", "before", "after"].every(function (k) {
+      return $(k).value.trim().length > 2;
+    });
+    $("finish").disabled = !(ex.pass && filled);
+  }
+  ["excl", "belief", "before", "after"].forEach(function (k) {
+    $(k).addEventListener("input", syncFinal);
+  });
+  $("back5").addEventListener("click", function () { show(4); });
+
+  /* --------------------------------------------------------------- card */
+  function cardData() {
+    var gaveUp = state.candidates.filter(function (c) { return c.id !== state.keptId; })
+      .map(function (c) { return { name: c.name, cost: c.giveUp }; });
+    return {
+      sentence: state.sentence, excl: state.excl, belief: state.belief,
+      before: state.before, after: state.after, gaveUp: gaveUp,
+      date: new Date().toISOString().slice(0, 10),
+    };
+  }
+
+  function renderCard() {
+    var d = cardData(), c = $("card");
+    function sec(label, node) {
+      var s = document.createElement("div"); s.className = "sec"; s.textContent = label;
+      c.appendChild(s); c.appendChild(node);
+    }
+    function p(text, cls) {
+      var el = document.createElement("p"); if (cls) el.className = cls;
+      el.textContent = text; return el;
+    }
+    c.innerHTML = "";
+    sec("I am for", p(d.sentence, "big"));
+    sec("I am not for", p(d.excl));
+    sec("What they believe", p(d.belief));
+    sec("The change", p(d.before + "  →  " + d.after));
+    var g = document.createElement("div"); g.className = "gave";
+    d.gaveUp.forEach(function (x) {
+      var el = document.createElement("div");
+      el.textContent = x.name + " — giving up: " + x.cost;
+      g.appendChild(el);
+    });
+    sec("What I gave up to say that", g);
+    var st = document.createElement("div"); st.className = "stamp";
+    st.textContent = "Decided " + d.date + " · revisit no sooner than 90 days from now";
+    c.appendChild(st);
+  }
+
+  function markdown() {
+    var d = cardData();
+    var lines = [
+      "# Position card", "", "**Decided " + d.date + "**", "",
+      "## I am for", d.sentence, "",
+      "## I am not for", d.excl, "",
+      "## What they believe that most people don't", d.belief, "",
+      "## The change", "- Before: " + d.before, "- After: " + d.after, "",
+      "## What I gave up to say that",
+    ];
+    d.gaveUp.forEach(function (x) { lines.push("- **" + x.name + "** — giving up: " + x.cost); });
+    lines.push("", "---", "Revisit no sooner than 90 days from " + d.date + ".");
+    return lines.join("\n");
+  }
+
+  $("finish").addEventListener("click", function () { renderCard(); show(6); });
+
+  $("copy").addEventListener("click", function () {
+    var text = markdown();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { toast("Copied as Markdown"); },
+        function () { fallbackCopy(text); }
+      );
+    } else { fallbackCopy(text); }
+  });
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); toast("Copied as Markdown"); }
+    catch (e) { toast("Copy failed — select the card and copy manually"); }
+    document.body.removeChild(ta);
+  }
+  $("print").addEventListener("click", function () { window.print(); });
+  $("restart").addEventListener("click", function () {
+    if (!confirm("Clear this decision and start over?")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    location.reload();
+  });
+
+  /* -------------------------------------------------------------- start */
+  load();
+  if (state.candidates.length) {
+    $("dump").value = state.candidates.map(function (c) { return c.name; }).join("\n");
+    renderCandidates();
+  }
+  $("sentence").value = state.sentence || "";
+  ["excl", "belief", "before", "after"].forEach(function (k) { $(k).value = state[k] || ""; });
+  syncDump();
+  if (state.step >= 3) renderCuts();
+  if (state.step >= 4) checkSentence();
+  if (state.step >= 5) syncFinal();
+  if (state.step === 6) renderCard();
+  show(Math.min(state.step || 1, 6));
+})();
+</script>
+</body>
+</html>
