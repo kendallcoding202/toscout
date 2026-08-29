@@ -73,3 +73,41 @@ test("scores degrade with each issue rather than being binary", () => {
   assert.ok(clean.score > messy.score, "a cleaner sentence should score higher");
   assert.ok(messy.score >= 0 && clean.score <= 100, "score stays in range");
 });
+
+/* --- regressions found by running the tool on this project itself --- */
+
+test("catches two audiences even when neither noun is in the vague list", () => {
+  const r = checkAudience("freelance copywriters and positioning consultants");
+  assert.ok(r.issues.some(i => i.kind === "conjunction"),
+    "'copywriters' is not in VAGUE_NOUNS, but -ers makes it a role noun");
+  assert.equal(r.pass, false);
+});
+
+test("accepts specificity that comes from behavior, not only from timing", () => {
+  for (const s of [
+    "consultants who run positioning workshops on a Miro board",
+    "bookkeepers who file quarterly VAT returns by hand",
+  ]) {
+    const r = checkAudience(s);
+    assert.equal(r.pass, true,
+      `${JSON.stringify(s)} is specific via activity — got: ${r.issues.map(i => i.message).join(" | ")}`);
+  }
+});
+
+test("an empty relative clause is still not specificity", () => {
+  for (const s of ["people who need help", "founders who want more customers", "teams that use software"]) {
+    assert.equal(checkAudience(s).pass, false, `${JSON.stringify(s)} says nothing`);
+  }
+});
+
+test("a hedge still fails even with a strong behavior clause", () => {
+  const r = checkAudience("anyone who has to write a landing page for a client");
+  assert.equal(r.pass, false, "hedges outrank everything else");
+  assert.ok(r.issues.some(i => i.kind === "hedge"));
+});
+
+test("the too-short message states the real threshold", () => {
+  const r = checkAudience("positioning consultants");
+  const msg = r.issues.find(i => i.kind === "short").message;
+  assert.ok(msg.startsWith("Three words or fewer"), "the check fires at 3 or fewer, so say three");
+});

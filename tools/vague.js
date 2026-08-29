@@ -37,6 +37,43 @@ const SITUATION = [
 
 const NUMERIC = /\b\d/;
 
+/* Verbs so general that a clause built from them says nothing.
+   "who need help" is not a behavior; "who run positioning workshops" is. */
+const GENERIC_VERBS = [
+  "need", "needs", "want", "wants", "like", "likes", "use", "uses", "using",
+  "have", "has", "are", "is", "do", "does", "get", "gets", "buy", "buys",
+  "help", "make", "makes", "work", "works", "run", "runs", "the", "a", "an",
+  "to", "of", "for", "and", "their", "them", "it", "with", "on", "in",
+  /* filler that reads as content but carries none */
+  "more", "less", "better", "best", "good", "great", "new", "other", "others",
+  "some", "many", "most", "all", "any", "thing", "things", "stuff", "easier",
+  "faster", "cheaper", "quality", "successful", "growth", "money", "time",
+];
+
+/* Person-role suffixes. Used only to decide whether a phrase names a group of
+   people, which is how we spot two audiences wearing one sentence. */
+const ROLE_SUFFIX = /(?:ers|ors|ists|ians|eurs)$/;
+
+function looksLikeAudienceNoun(word) {
+  return VAGUE_NOUNS.indexOf(word) !== -1 || (word.length > 5 && ROLE_SUFFIX.test(word));
+}
+
+/* A relative clause counts as specificity when it actually describes something:
+   at least three words after "who"/"that", and at least one of them carrying meaning. */
+function hasBehaviorClause(lower) {
+  var m = lower.match(/\b(?:who|that)\s+(.+)$/);
+  if (!m) return false;
+  var rest = words(m[1]);
+  if (rest.length < 3) return false;
+  /* A vague noun inside the clause is no better than one outside it —
+     "who want more customers" describes nothing. */
+  return rest.some(function (w) {
+    return w.length > 3 &&
+           GENERIC_VERBS.indexOf(w) === -1 &&
+           VAGUE_NOUNS.indexOf(w) === -1;
+  });
+}
+
 function words(text) {
   return text.toLowerCase().replace(/[^a-z0-9\s-]/g, " ").split(/\s+/).filter(Boolean);
 }
@@ -57,7 +94,7 @@ function checkAudience(raw) {
   if (ws.length < 4) {
     issues.push({
       kind: "short",
-      message: "Four words or fewer isn't an audience, it's a category. Who exactly, and when?",
+      message: "Three words or fewer isn't an audience, it's a category. Who exactly, and when?",
     });
   }
 
@@ -74,7 +111,7 @@ function checkAudience(raw) {
   const andSplit = lower.split(/\s+(?:and|plus|as well as|&)\s+/);
   if (andSplit.length > 1) {
     const bothLookLikeAudiences = andSplit.filter((part) =>
-      VAGUE_NOUNS.some((n) => words(part).includes(n))
+      words(part).some(looksLikeAudienceNoun)
     ).length > 1;
     if (bothLookLikeAudiences) {
       issues.push({
@@ -96,16 +133,16 @@ function checkAudience(raw) {
 
   const hasSituation = SITUATION.some((s) => lower.includes(s));
   const hasNumber = NUMERIC.test(text);
-  if (!hasSituation && !hasNumber) {
+  const hasBehavior = hasBehaviorClause(lower);
+  if (!hasSituation && !hasNumber && !hasBehavior) {
     issues.push({
       kind: "no-situation",
-      message: "Nothing here describes a moment. When are they? (“who just went full-time”, “in their first 90 days”, “after their first hire”)",
+      message: "Nothing here says what makes them different from everyone else with that job title. Give them a moment (“who just went full-time”), a constraint (“with fewer than 5 clients”), or something they actually do (“who run their own workshops”).",
     });
-  } else if (hasSituation) {
-    strengths.push("Names a moment, not just a job title.");
-  } else if (hasNumber) {
-    strengths.push("Carries a concrete constraint.");
   }
+  if (hasSituation) strengths.push("Names a moment, not just a job title.");
+  if (hasNumber) strengths.push("Carries a concrete constraint.");
+  if (hasBehavior) strengths.push("Describes what they actually do, not just what they are.");
 
   if (qualifierCount >= 5) strengths.push("Enough qualifiers to exclude people.");
   if (bareNouns.length === 0 && ws.length >= 4) strengths.push("Avoids the usual catch-all nouns.");
@@ -129,5 +166,8 @@ function checkExclusion(raw) {
 }
 
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { checkAudience, checkExclusion, VAGUE_NOUNS, HEDGES, SITUATION };
+  module.exports = {
+    checkAudience, checkExclusion, looksLikeAudienceNoun, hasBehaviorClause,
+    VAGUE_NOUNS, HEDGES, SITUATION,
+  };
 }
