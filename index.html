@@ -3,150 +3,245 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ToScout — Know before it breaks you</title>
-<meta name="description" content="ToScout watches your vendors' pricing, terms of service, and API deprecations — Stripe, OpenAI, AWS, and 50+ more — and alerts you in plain English before changes cost you.">
+<title>Scout — Your people already told you what to say</title>
+<meta name="description" content="Scout listens to where your audience actually talks and keeps one living document of their exact words — every line backed by a real quote and a link. Red Pen judges your writing against it, and refuses to rewrite a word.">
 <style>
   :root {
-    --bg: #0b0e14; --panel: #12161f; --panel2: #171c27; --line: #232a38;
-    --ink: #e8ecf3; --muted: #98a2b3; --accent: #f59e0b; --accent2: #fbbf24;
-    --good: #34d399; --bad: #f87171;
+    --paper: #faf7f1; --card: #fffdf9; --rule: #e2dacb; --rule2: #efe8db;
+    --ink: #1c1a16; --muted: #6d6558; --red: #b2382c; --red-soft: #fbeeec;
+    --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   }
+  /* Deliberately light: this is a notebook, not a dashboard. The buyer is a writer. */
   * { box-sizing: border-box; margin: 0; }
-  html { scroll-behavior: smooth; }
-  body { background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; }
-  .wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; }
-  .tos { color: var(--accent); font-weight: 800; }
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 0; }
-  .logo { font-size: 22px; font-weight: 800; letter-spacing: -.02em; }
-  nav a.cta { background: var(--accent); color: #1a1200; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 14px; }
-  .hero { padding: 72px 0 40px; text-align: center; }
-  .hero h1 { font-size: clamp(30px, 5.5vw, 52px); line-height: 1.12; letter-spacing: -.03em; font-weight: 800; }
-  .hero p.sub { color: var(--muted); font-size: clamp(16px, 2.4vw, 19px); max-width: 640px; margin: 20px auto 0; }
-  .badge { display: inline-block; border: 1px solid var(--line); color: var(--muted); font-size: 13px; border-radius: 999px; padding: 5px 14px; margin-bottom: 22px; background: var(--panel); }
-  form.capture { display: flex; gap: 10px; justify-content: center; margin: 32px auto 10px; max-width: 460px; flex-wrap: wrap; }
-  form.capture input {
-    flex: 1; min-width: 220px; background: var(--panel); border: 1px solid var(--line);
-    border-radius: 10px; padding: 13px 16px; color: var(--ink); font-size: 16px;
-  }
-  form.capture button {
-    background: var(--accent); border: none; border-radius: 10px; padding: 13px 22px;
-    font-weight: 800; font-size: 16px; color: #1a1200; cursor: pointer;
-  }
-  form.capture button:hover { background: var(--accent2); }
-  .tiny { color: var(--muted); font-size: 13px; }
-  .alert-demo { max-width: 620px; margin: 56px auto 0; text-align: left; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
-  .alert-demo .bar { background: var(--panel2); padding: 10px 16px; font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); }
-  .alert-demo .body { padding: 18px 20px; }
-  .alert-demo .sev { display: inline-block; background: #3a2f10; color: var(--accent2); font-size: 12px; font-weight: 700; border-radius: 6px; padding: 2px 9px; margin-bottom: 10px; }
-  .alert-demo h3 { font-size: 16px; margin-bottom: 6px; }
-  .alert-demo p { color: var(--muted); font-size: 14px; }
-  section { padding: 64px 0 8px; }
-  section h2 { font-size: clamp(24px, 3.6vw, 32px); letter-spacing: -.02em; text-align: center; margin-bottom: 14px; }
-  section p.lead { color: var(--muted); text-align: center; max-width: 640px; margin: 0 auto 40px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
-  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 22px; }
-  .card .n { color: var(--accent); font-weight: 800; font-size: 14px; }
-  .card h3 { font-size: 17px; margin: 8px 0 8px; }
-  .card p { color: var(--muted); font-size: 14.5px; }
-  .pain { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 30px; margin-top: 8px; }
-  .pain blockquote { font-size: 17px; border-left: 3px solid var(--accent); padding-left: 18px; }
-  .pain .who { color: var(--muted); font-size: 14px; margin-top: 12px; }
-  .vendors { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 8px; }
-  .vendors span { border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 999px; padding: 5px 13px; font-size: 13px; }
-  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; max-width: 640px; margin: 0 auto; }
-  .price { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 26px; text-align: center; }
-  .price.hot { border-color: var(--accent); }
-  .price .amt { font-size: 34px; font-weight: 800; }
-  .price .amt small { font-size: 14px; color: var(--muted); font-weight: 500; }
-  .price ul { list-style: none; padding: 14px 0 0; color: var(--muted); font-size: 14.5px; }
-  .price li { padding: 4px 0; }
-  .founding { text-align: center; background: linear-gradient(135deg, #1c1710, #171c27); border: 1px solid var(--accent); border-radius: 16px; padding: 34px 26px; margin-top: 26px; }
-  footer { padding: 56px 0 36px; text-align: center; color: var(--muted); font-size: 13.5px; }
-  footer .logo { font-size: 16px; margin-bottom: 8px; }
-  @media (prefers-color-scheme: light) { /* deliberately dark-only: devtool audience */ }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.65; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 22px; }
+  a { color: inherit; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0; }
+  .logo { font-family: var(--serif); font-size: 23px; font-weight: 700; letter-spacing: -.02em; }
+  .logo .dot { color: var(--red); }
+  nav a.cta { background: var(--ink); color: var(--paper); padding: 9px 17px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 14px; }
+  nav a.cta:hover { background: var(--red); }
+
+  .hero { padding: 60px 0 24px; }
+  .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--red); margin-bottom: 18px; }
+  .hero h1 { font-family: var(--serif); font-size: clamp(32px, 6vw, 56px); line-height: 1.08; letter-spacing: -.025em; font-weight: 700; max-width: 16ch; }
+  .hero p.sub { color: var(--muted); font-size: clamp(16.5px, 2.3vw, 19px); max-width: 60ch; margin-top: 22px; }
+  .hero p.sub strong { color: var(--ink); font-weight: 600; }
+
+  form.capture { display: flex; gap: 9px; margin: 30px 0 10px; max-width: 470px; flex-wrap: wrap; }
+  form.capture input { flex: 1; min-width: 210px; background: var(--card); border: 1px solid var(--rule); border-radius: 7px; padding: 13px 15px; color: var(--ink); font-size: 16px; font-family: inherit; }
+  form.capture input:focus { outline: 2px solid var(--red); outline-offset: -1px; border-color: var(--red); }
+  form.capture button { background: var(--red); border: none; border-radius: 7px; padding: 13px 22px; font-weight: 700; font-size: 16px; color: #fff; cursor: pointer; font-family: inherit; }
+  form.capture button:hover { background: #8f2c22; }
+  .tiny { color: var(--muted); font-size: 13.5px; }
+
+  section { padding: 60px 0 0; }
+  section h2 { font-family: var(--serif); font-size: clamp(25px, 3.8vw, 34px); letter-spacing: -.02em; line-height: 1.2; margin-bottom: 12px; }
+  section p.lead { color: var(--muted); max-width: 62ch; margin-bottom: 30px; font-size: 16.5px; }
+  hr.rule { border: none; border-top: 1px solid var(--rule); margin: 60px 0 0; }
+
+  /* card demo */
+  .demo { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; margin-top: 40px; box-shadow: 0 1px 2px rgba(28,26,22,.04); }
+  .demo .bar { background: #f3ede2; border-bottom: 1px solid var(--rule); padding: 9px 18px; font-family: var(--mono); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .demo .body { padding: 22px 24px 26px; }
+  .demo h3 { font-family: var(--serif); font-size: 19px; margin-bottom: 3px; }
+  .demo .who { color: var(--muted); font-size: 14px; margin-bottom: 20px; }
+  .sec-label { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--red); margin: 22px 0 10px; }
+  .sec-label:first-of-type { margin-top: 0; }
+  .quote { border-left: 2px solid var(--rule); padding: 2px 0 2px 15px; margin-bottom: 13px; }
+  .quote p { font-family: var(--serif); font-size: 16.5px; line-height: 1.45; }
+  .quote cite { display: block; font-style: normal; font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 5px; }
+  .quote cite a { color: var(--red); text-decoration: none; border-bottom: 1px solid rgba(178,56,44,.3); }
+
+  /* red pen demo */
+  .pen { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; margin-top: 18px; }
+  .draft { font-family: var(--serif); font-size: 19px; line-height: 1.5; }
+  .draft s { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 2px; color: var(--muted); }
+  .pen-note { margin-top: 16px; border-top: 1px dashed var(--rule); padding-top: 16px; }
+  .pen-note p { font-size: 15px; color: var(--muted); margin-bottom: 9px; }
+  .pen-note p:last-child { margin-bottom: 0; }
+  .pen-note .mark { color: var(--red); font-weight: 700; font-family: var(--mono); font-size: 12px; letter-spacing: .05em; }
+  .refuse { margin-top: 18px; background: var(--red-soft); border: 1px solid rgba(178,56,44,.22); border-radius: 7px; padding: 13px 16px; font-size: 14.5px; }
+
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+  .step { background: var(--card); padding: 22px; }
+  .step .n { font-family: var(--mono); font-size: 12px; color: var(--red); letter-spacing: .08em; }
+  .step h3 { font-family: var(--serif); font-size: 18px; margin: 7px 0 8px; }
+  .step p { color: var(--muted); font-size: 15px; }
+
+  .godin { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 26px 28px; }
+  .godin ol { margin: 0; padding-left: 22px; }
+  .godin li { margin-bottom: 9px; color: var(--muted); font-size: 15.5px; }
+  .godin li strong { color: var(--ink); }
+  .godin li.hit { color: var(--ink); }
+  .godin li.hit strong { color: var(--red); }
+  .godin .attrib { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--rule2); font-size: 13.5px; color: var(--muted); }
+
+  .price-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
+  .price { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; }
+  .price.hot { border-color: var(--red); }
+  .price h3 { font-family: var(--serif); font-size: 19px; }
+  .price .amt { font-size: 30px; font-weight: 700; letter-spacing: -.02em; margin: 6px 0 2px; }
+  .price .amt small { font-size: 14px; color: var(--muted); font-weight: 400; }
+  .price .for { font-family: var(--mono); font-size: 11px; letter-spacing: .07em; text-transform: uppercase; color: var(--red); }
+  .price ul { list-style: none; padding: 14px 0 0; margin: 0; color: var(--muted); font-size: 14.5px; }
+  .price li { padding: 3px 0 3px 16px; position: relative; }
+  .price li::before { content: "—"; position: absolute; left: 0; color: var(--rule); }
+
+  .founding { background: var(--card); border: 1px solid var(--red); border-radius: 10px; padding: 30px 28px; margin-top: 22px; }
+  .founding h2 { margin-bottom: 8px; }
+
+  footer { padding: 56px 0 40px; color: var(--muted); font-size: 13.5px; margin-top: 60px; border-top: 1px solid var(--rule); }
+  footer .logo { font-size: 17px; margin-bottom: 8px; }
+  footer p { margin-bottom: 7px; }
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <nav>
-    <div class="logo"><span class="tos">ToS</span>cout</div>
+    <div class="logo">Scout<span class="dot">.</span></div>
     <a class="cta" href="#signup">Get early access</a>
   </nav>
 
   <div class="hero">
-    <div class="badge">🔭 Early access — founding members get 50% off for life</div>
-    <h1>Your vendors change their pricing, terms&nbsp;&amp;&nbsp;APIs quietly.<br>Find out loudly.</h1>
-    <p class="sub">ToScout watches the platforms your product depends on — Stripe, OpenAI, AWS, Twilio, the app stores — and sends you plain-English alerts when their pricing, terms of service, limits, or APIs change. Before it costs you.</p>
+    <div class="kicker">Voice-of-customer research, kept current</div>
+    <h1>Your people already told you what to say.</h1>
+    <p class="sub">Scout reads the forums, threads and comment sections where your audience actually talks, and keeps one living document of their exact words — <strong>every line backed by a real quote and a link.</strong> Then Red Pen holds your draft up against it, and refuses to rewrite a single word for you.</p>
 
     <form class="capture" id="signup" action="FORM_ENDPOINT_HERE" method="POST">
-      <input type="email" name="email" placeholder="you@yourstartup.com" required>
-      <button type="submit">Scout my stack →</button>
+      <input type="email" name="email" placeholder="you@yourstudio.com" required aria-label="Email address">
+      <button type="submit">Get early access</button>
     </form>
-    <p class="tiny">Connect your GitHub repo later — we auto-detect your vendors. No spam, ever.</p>
+    <p class="tiny">For copywriters, positioning consultants, and founders who write their own pages.</p>
+  </div>
 
-    <div class="alert-demo">
-      <div class="bar">📬 Example alert — what lands in your inbox</div>
-      <div class="body">
-        <span class="sev">HEADS-UP · affects you</span>
-        <h3>Stripe updated its pricing page</h3>
-        <p>Cross-border card fees increased from 1.5% → 1.9% starting next month. Based on your stack (Stripe + international customers), this likely raises your processing costs. <u>See the exact diff →</u></p>
+  <div class="demo">
+    <div class="bar"><span>Narrative card · example</span><span>Freelance illustrators who just went full-time</span></div>
+    <div class="body">
+      <h3>How they actually talk about pricing</h3>
+      <p class="who">Built from 9 sources · 214 quotes · updated weekly</p>
+
+      <div class="sec-label">Their words</div>
+      <div class="quote">
+        <p>“I feel like a fraud charging $80 an hour when I don't have an agency behind me.”</p>
+        <cite><a href="#">forum thread →</a> · illustrative example</cite>
+      </div>
+      <div class="quote">
+        <p>“I lose an entire day a month to invoicing and chasing people who said yes in March.”</p>
+        <cite><a href="#">forum thread →</a> · illustrative example</cite>
+      </div>
+
+      <div class="sec-label">Tension</div>
+      <div class="quote">
+        <p>“Every time I raise my rate I lose the client who referred me everyone else.”</p>
+        <cite><a href="#">forum thread →</a> · illustrative example</cite>
+      </div>
+
+      <div class="sec-label">Unmet ask</div>
+      <div class="quote">
+        <p>“Does anyone know a thing that just tells me what to charge for this? Not a course. A number.”</p>
+        <cite><a href="#">forum thread →</a> · illustrative example</cite>
       </div>
     </div>
   </div>
+  <p class="tiny" style="margin-top:12px;">Quotes above are illustrative. In a real card every line links to the post it came from — that's the whole point.</p>
+
+  <hr class="rule">
 
   <section>
-    <h2>The last founders to find out paid the most</h2>
-    <p class="lead">Platform changes killed apps that did everything else right.</p>
-    <div class="pain">
-      <blockquote>Reddit's API pricing change gave Apollo a $20M/year bill overnight. Apollo — and a whole generation of Reddit apps — shut down within a month. Meta ended its Events API without notice. Google Maps' price hike broke thousands of apps' unit economics in one announcement.</blockquote>
-      <p class="who">Your stack is 20–30 companies deep. Each one can change your costs, your legal exposure, or your product — with a blog post you'll never see. ToScout reads them all, every day, so you don't have to.</p>
+    <h2>Nobody wants to read your words. They want to read theirs.</h2>
+    <p class="lead">Most landing pages fail in a boring way: they're written in the founder's vocabulary, for an audience that uses a completely different one. You wrote <em>streamline your workflow</em>. They said <em>I lose a whole day to invoicing</em>. Same problem. Only one of those sentences sells.</p>
+
+    <div class="pen">
+      <p class="draft">Scout helps creative professionals <s>streamline their workflow</s> and <s>unlock their full potential</s> with AI-powered insights.</p>
+      <div class="pen-note">
+        <p><span class="mark">FLAG</span> &nbsp;“Streamline their workflow” — zero people in this audience have ever used that phrase. Fourteen said a version of <em>“I lose a whole day to invoicing.”</em></p>
+        <p><span class="mark">ASK</span> &nbsp;Who is this for, specifically? “Creative professionals” covers a fourteen-year-old with an iPad and a studio of forty.</p>
+        <p><span class="mark">ASK</span> &nbsp;What change are you trying to make? Name the person before and the person after.</p>
+      </div>
+      <div class="refuse"><strong>Red Pen stops here.</strong> It has no rewrite button, no “stronger version,” no autocomplete. The words have to be yours or they're not worth anything.</div>
     </div>
   </section>
+
+  <hr class="rule">
 
   <section>
     <h2>How it works</h2>
-    <p class="lead">Set up once. Involvement after that: reading one email.</p>
-    <div class="cards">
-      <div class="card"><div class="n">01</div><h3>Connect your repo</h3><p>Sign in with GitHub (read-only). ToScout reads your dependencies and instantly maps your vendor stack — Stripe, OpenAI, Vercel, Resend, whatever you're built on.</p></div>
-      <div class="card"><div class="n">02</div><h3>We watch everything</h3><p>Pricing pages, terms of service, API changelogs and deprecation feeds — checked daily for every vendor in your stack.</p></div>
-      <div class="card"><div class="n">03</div><h3>Plain-English alerts</h3><p>No raw diffs. AI reads every change and tells you what changed, how severe it is, and whether it affects <em>you</em> — plus a monthly "state of your stack" report.</p></div>
+    <p class="lead">Set it up in a few minutes. After that, involvement is one email a week.</p>
+    <div class="steps">
+      <div class="step"><div class="n">01</div><h3>Name the group</h3><p>One sentence. “Freelance illustrators who just went full-time.” Scout proposes the ten or twenty places those people actually gather — forums, threads, Q&amp;A sites, comment sections. You confirm and edit.</p></div>
+      <div class="step"><div class="n">02</div><h3>Scout listens</h3><p>It reads them on a schedule and keeps one page current: their words, their tensions, their dreams, what they're against, and the things they've asked for that nobody built.</p></div>
+      <div class="step"><div class="n">03</div><h3>Red Pen judges you</h3><p>Paste your homepage, your launch email, your pitch. It marks every phrase your audience has never said, asks the questions you skipped, and then leaves the writing to you.</p></div>
     </div>
-    <p class="lead" style="margin-top:36px; margin-bottom:12px;">Watching the platforms indie SaaS actually runs on:</p>
-    <div class="vendors">
-      <span>Stripe</span><span>OpenAI</span><span>Anthropic</span><span>AWS</span><span>Vercel</span><span>Supabase</span><span>Twilio</span><span>Resend</span><span>Cloudflare</span><span>App Store</span><span>Google Play</span><span>Shopify</span><span>Paddle</span><span>+ 40 more</span>
+    <p class="lead" style="margin-top:26px;">A quiet week says “nothing shifted” in one line and stops. Scout is not allowed to invent an insight to justify the email.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section>
+    <h2>Built around the step everyone skips</h2>
+    <p class="lead">Seth Godin describes marketing in five steps. Four of them have a hundred tools. One doesn't.</p>
+    <div class="godin">
+      <ol>
+        <li><strong>Invent</strong> a thing worth making, with a story worth telling.</li>
+        <li><strong>Build it</strong> so that a few people particularly benefit and care.</li>
+        <li class="hit"><strong>Tell a story that matches the built-in narrative and dreams of that tiny group</strong> — the smallest viable market. <em>This is what Scout is for.</em></li>
+        <li><strong>Spread the word</strong> — the step everybody gets excited about.</li>
+        <li><strong>Show up</strong> regularly, consistently and generously, for years.</li>
+      </ol>
+      <p class="attrib">Paraphrased from <em>This Is Marketing</em> by Seth Godin. Step three is the one you can't do from a chair — it needs the actual words of actual people. That's the gap.</p>
     </div>
   </section>
 
+  <hr class="rule">
+
   <section>
     <h2>Pricing</h2>
-    <p class="lead">Cheaper than one surprise.</p>
+    <p class="lead">Priced against the four hours it saves on a client project, not against a browser extension.</p>
     <div class="price-grid">
       <div class="price">
-        <h3>Free</h3>
+        <div class="for">The front door</div>
+        <h3>Red Pen</h3>
         <div class="amt">$0</div>
-        <ul><li>Watch 3 vendors</li><li>Email alerts</li><li>Repo auto-detect</li></ul>
+        <ul><li>Unlimited critiques</li><li>One card you write yourself</li><li>Never rewrites for you</li></ul>
       </div>
       <div class="price hot">
-        <h3>Pro</h3>
-        <div class="amt">$19<small>/mo</small></div>
-        <ul><li>Your whole stack, unlimited</li><li>Severity + "affects you" analysis</li><li>Monthly state-of-stack report</li><li>Slack alerts</li></ul>
+        <div class="for">For one product</div>
+        <h3>Scout</h3>
+        <div class="amt">$49<small>/mo</small></div>
+        <ul><li>One audience, up to 12 sources</li><li>Living card, weekly digest</li><li>Export to Markdown or PDF</li></ul>
+      </div>
+      <div class="price">
+        <div class="for">For client work</div>
+        <h3>Practice</h3>
+        <div class="amt">$99<small>/mo</small></div>
+        <ul><li>Three audiences</li><li>Faster cadence, Slack delivery</li><li>Client-ready branded export</li></ul>
       </div>
     </div>
+
     <div class="founding">
-      <h2 style="margin-bottom:8px;">Founding members: 50% off. Forever.</h2>
-      <p class="lead" style="margin-bottom:18px;">Join the early-access list now and lock in Pro at $9.50/mo for life when we launch.</p>
+      <h2>Founding members: 40% off for a year</h2>
+      <p class="lead" style="margin-bottom:18px;">We're hand-building the first ten cards ourselves, free, to learn what belongs in them. Leave your email and tell us who you're trying to reach — yours might be one of them.</p>
       <form class="capture" action="FORM_ENDPOINT_HERE" method="POST">
-        <input type="email" name="email" placeholder="you@yourstartup.com" required>
-        <button type="submit">Lock in 50% off →</button>
+        <input type="email" name="email" placeholder="you@yourstudio.com" required aria-label="Email address">
+        <button type="submit">Claim a card</button>
       </form>
+      <p class="tiny" style="margin-top:8px;">No spam. One email when it's ready, and nothing else.</p>
     </div>
   </section>
 
   <footer>
-    <div class="logo"><span class="tos">ToS</span>cout</div>
-    <p>Know before it breaks you.</p>
-    <p style="margin-top:10px;">ToScout summarizes vendor changes for awareness — it isn't legal advice.<br>© 2026 ToScout</p>
+    <div class="logo">Scout<span class="dot">.</span></div>
+    <p>Your people already told you what to say.</p>
+    <p>Scout quotes short excerpts from public discussions and always links back to the source. It doesn't publish author names.</p>
+    <p>© 2026 Scout</p>
   </footer>
+
 </div>
 </body>
 </html>
