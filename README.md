@@ -37,7 +37,16 @@ Or just open `pickone.html` in a browser. No build step, no dependencies, no ser
 ```bash
 node tools/tests/test_vague.mjs      # unit, no dependencies
 node tools/tests/e2e_pickone.mjs     # browser flow, needs: npm install playwright
+
+# pre-flight — run before sending the link to anyone
+mkdir -p /tmp/pf/toscout && git archive HEAD | tar -x -C /tmp/pf/toscout
+(cd /tmp/pf && python3 -m http.server 8765 &)
+node tools/tests/preflight.mjs
 ```
+
+The pre-flight serves the site the way GitHub Pages does — over HTTP at a project subpath —
+and covers what would ruin a first impression: a phone, a browser with storage blocked, and
+arriving via the landing page instead of directly.
 
 The e2e test covers the gates that make this a tool rather than a form: you can't advance past
 a vague audience, an unstated cost, or an exclusion that excludes nobody.
