@@ -70,7 +70,8 @@ sell, show the tool doing its one trick, and ask one blunt question.
 > > "teams" on its own describes millions of people. What kind, at what moment?
 > > Nothing here says what makes them different from everyone else with that job title.
 >
-> It's free, no signup, runs entirely in the browser, takes about ten minutes: [link]
+> It's free, no signup, runs entirely in the browser, takes about ten minutes:
+> https://kendallcoding202.github.io/toscout/pickone.html
 >
 > One question if you try it: did you finish it, or did you bail? Either answer is useful —
 > I'd rather know it's annoying than not know.
