@@ -55,31 +55,47 @@ professional opinion, which is flattering, cheap to give, and gets replies.
 
 ---
 
-### Message A — for practitioners (the buyers)
+### How to open
 
-Do not ask for their time. Do not describe the product. Reference the specific thing they
-sell, show the tool doing its one trick, and ask one blunt question.
+**Never open with "I built a thing."** It puts you at the centre of a message that has to be
+about them, and it's the sentence that loses attention — a stranger's project is not news.
 
-> **Subject: your homepage says "ambitious teams"**
+Open with **their work and a real question about it.** Name the annoying part of the job they
+already do, ask about it rather than asserting it, then say what changes for them. What the
+thing is comes third and briefly, and the fact that you made it barely matters.
+
+| Order | What goes there |
+|---|---|
+| 1 | The annoying part of *their* job, phrased as a question they'd want to answer |
+| 2 | What it changes for them, concretely |
+| 3 | What it is — one sentence, no features |
+| 4 | One blunt question, easy to answer badly |
+
+Do not ask for their time, do not attach a deck, do not say "quick chat".
+
+
+> **Subject: the part of the project where they say "everyone"**
 >
 > Hi [name] — saw your post about the [client type] repositioning.
 >
-> I built a small thing that argues with audience sentences. I fed it the line from your
-> homepage — *"we help ambitious teams scale faster"* — and it refused it:
+> How much of the early work goes on getting a client to stop saying they serve everyone?
+> That part is hard to bill for, because it isn't expertise — it's just refusing to accept
+> their first answer, over and over, until they give you a real one.
 >
-> > "teams" on its own describes millions of people. What kind, at what moment?
-> > Nothing here says what makes them different from everyone else with that job title.
+> There's now a free tool that does that refusing. The client lists every audience, has to
+> keep one, and can't write it down until the sentence actually excludes somebody. They arrive
+> with a one-page brief instead of a shrug.
 >
-> It's free, no signup, runs entirely in the browser, takes about ten minutes:
 > https://kendallcoding202.github.io/toscout/pickone.html
 >
-> One question if you try it: did you finish it, or did you bail? Either answer is useful —
-> I'd rather know it's annoying than not know.
+> Worth ten minutes of your own to see whether it holds up — and if it doesn't, I'd rather
+> know where it breaks than not.
 >
 > [you]
 
-**Why this works:** you're doing them a favour before asking for anything, the observation is
-about *them*, and the ask is one question they can answer in four words.
+**Why this works:** it opens inside their job, not yours. The first thing they read is a
+question they have an opinion about, the benefit is concrete, and what the thing *is* comes
+third — where it belongs.
 
 ---
 
@@ -101,30 +117,31 @@ Sells a *90-minute positioning workshop* and delivers a *1–3 page Positioning 
 Brief*. That is precisely the session this software runs and the artifact it outputs. Best
 match on the list.
 
-> **Subject: the 90-minute positioning workshop, as software**
+> **Subject: the first 30 minutes of a 90-minute workshop**
 >
-> Hi Michal — you sell a 90-minute positioning workshop and hand back a 1–3 page positioning
-> brief. I built a free tool that runs that kind of session and produces that kind of
-> document, and I'd rather hear from someone who does this for a living than keep guessing.
+> Hi Michal —
 >
-> It's called Pick One. Ten minutes, no signup, runs entirely in the browser — nothing is
-> stored anywhere but your own tab. Its one trick is that it refuses vague answers and says
-> why. Type "B2B SaaS and tech companies" and it comes back with:
+> In a 90-minute positioning workshop, how much of it goes on getting the client to stop
+> saying "we serve everyone"? That stretch is the least valuable use of your ninety minutes
+> and the hardest to bill for, because it isn't expertise — it's just declining to accept
+> their first answer until they give you a real one.
 >
-> > *Nothing here says what makes them different from everyone else with that job title. Give
-> > them a moment, a constraint, or something they actually do.*
+> There's now a free tool that does that part, so clients can arrive having already been
+> through it. It makes them list every audience they think they serve, keep exactly one, write
+> down what they're losing by dropping the others, and it won't let them finish until the
+> sentence excludes somebody. They turn up with a one-page brief instead of a shrug.
 >
-> — and it won't let you continue until the sentence excludes somebody.
+> If it works, your ninety minutes start roughly where they currently get to at minute thirty.
 >
 > https://kendallcoding202.github.io/toscout/pickone.html
 >
-> One question, and a blunt answer is the useful one: would you ever put this in front of a
-> client before a workshop, or would it get in the way? If it gets in the way I'd like to know
+> Ten minutes to run yourself. The blunt answer is the useful one: would you send this to a
+> client before a session, or would it get in your way? If it gets in the way I'd like to know
 > exactly where.
 >
 > — [you]
 >
-> No pitch behind this, there's nothing to buy.
+> Nothing to buy, no pitch behind it.
 
 Note the example input is generic on purpose. Do not quote her own homepage back at her.
 
@@ -133,34 +150,45 @@ Note the example input is generic on purpose. Do not quote her own homepage back
 Sells a *5-day positioning sprint*, plus a 4-week GTM Foundation Sprint and ongoing PMM from
 about £5k/month.
 
-> **Subject: day one of the 5-day positioning sprint**
+> **Subject: day one of the sprint**
 >
-> Hi — you run a 5-day positioning sprint. I built a free tool for what I assume is the ugliest
-> part of day one: getting a team to name one audience and admit what they're giving up by
-> dropping the others.
+> Hi —
 >
-> It refuses vague answers and won't advance until the sentence excludes somebody. Ten minutes,
-> no signup: https://kendallcoding202.github.io/toscout/pickone.html
+> On a 5-day positioning sprint, how long does day one spend getting a room full of people to
+> agree on one audience and admit what they're giving up to pick it? That argument seems like
+> the bit that decides whether the other four days are any good.
 >
-> Would this save you an hour on day one, or is the argument the part clients need to have with
-> a human in the room? Genuinely asking — if it's the latter, that's the answer.
+> There's a free tool that runs exactly that argument, so a team can have it before you're in
+> the room. It won't let them finish until the sentence excludes somebody, and it makes each
+> person write down the cost of every audience they drop.
+>
+> https://kendallcoding202.github.io/toscout/pickone.html
+>
+> Would that save you a chunk of day one, or is the argument the part they need to have with a
+> human present? Genuinely asking — if it's the latter, that's the answer and I'd rather have
+> it.
 
 #### Fletch PMM
 
 Runs a *two-week homepage messaging sprint*, reportedly 500+ B2B SaaS companies, and publishes
 positioning frameworks publicly. Higher tier, and the most likely to share it if they like it.
 
-> **Subject: a tool that argues with audience sentences**
+> **Subject: every version of "we help ambitious teams"**
 >
-> Hi — you've run homepage messaging sprints for hundreds of B2B SaaS companies, so you've
-> probably seen every version of "we help ambitious teams" there is.
+> Hi —
 >
-> I built a free tool that refuses those sentences and says specifically what's wrong with them.
-> No AI, just pattern matching on the ways vagueness shows up. Ten minutes, no signup:
+> After a few hundred homepage messaging sprints you've presumably seen every possible way a
+> company can describe an audience without describing anyone. Does the same handful of phrases
+> come back every time?
+>
+> There's a free tool that refuses those sentences and says exactly what's wrong with each one
+> — no AI, just the patterns vagueness reliably takes. If it's any good it should catch what
+> you'd catch, before the client gets to you.
+>
 > https://kendallcoding202.github.io/toscout/pickone.html
 >
-> One question: what's the vaguest audience sentence it should catch and doesn't? I'd rather
-> find the holes from someone who's seen a few hundred of them.
+> The useful question: what's the vaguest sentence it should catch and doesn't? I'd rather find
+> the holes from someone who's seen a few hundred of them than wait to be told by a customer.
 
 That last question is worth stealing generally — asking an expert to break your thing gets a
 better response rate than asking them to like it.

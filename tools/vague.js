@@ -48,7 +48,58 @@ const GENERIC_VERBS = [
   "more", "less", "better", "best", "good", "great", "new", "other", "others",
   "some", "many", "most", "all", "any", "thing", "things", "stuff", "easier",
   "faster", "cheaper", "quality", "successful", "growth", "money", "time",
+  /* aspiration verbs: every company wants these, so wanting them distinguishes nobody */
+  "scale", "scaling", "grow", "growing", "succeed", "win", "improve", "increase",
+  "achieve", "reach", "level", "convert", "compete", "thrive", "expand",
 ];
+
+/* Adjectives that feel like qualifiers and exclude nobody. Nobody describes their own
+   team as unambitious, so "ambitious teams" and "teams" name exactly the same people. */
+const EMPTY_MODIFIERS = [
+  "ambitious", "innovative", "forward-thinking", "forwardthinking", "modern",
+  "high-growth", "fast-growing", "fastgrowing", "growth-minded", "cutting-edge",
+  "next-generation", "world-class", "leading", "top", "serious", "savvy",
+  "smart", "busy", "driven", "motivated", "passionate", "dynamic", "agile",
+  "data-driven", "results-driven", "scaling", "growing", "emerging", "elite",
+  "premium", "quality", "professional", "experienced", "established",
+];
+
+/* The answers almost everyone gives. Not wrong — just not yours. */
+const STOCK_AUDIENCES = [
+  "small business owners", "small businesses", "small and medium businesses",
+  "startups", "early-stage startups", "early stage startups", "founders",
+  "solo founders", "b2b saas companies", "saas companies", "marketing teams",
+  "content creators", "busy professionals", "entrepreneurs", "freelancers",
+  "agencies", "e-commerce brands", "ecommerce brands", "online businesses",
+  "coaches and consultants", "product managers", "developers", "designers",
+  "digital marketers", "knowledge workers", "remote teams", "side hustlers",
+  "creators", "growing companies", "ambitious teams", "modern teams",
+  "smbs", "smes", "enterprise customers", "sales teams", "hr teams",
+];
+
+const STOPWORDS = [
+  "the", "a", "an", "and", "or", "but", "for", "with", "without", "who", "that",
+  "their", "them", "they", "you", "your", "our", "we", "us", "is", "are", "was",
+  "just", "only", "very", "really", "about", "from", "into", "than", "then",
+  "this", "these", "those", "what", "when", "where", "how", "why", "can", "will",
+];
+
+/* Crude plural folding, so "workshops" in the copy matches "workshop" in the audience.
+   Both sides get the same treatment, so it only has to be consistent, not correct. */
+function stem(word) {
+  return word.replace(/ies$/, "y").replace(/([^s])s$/, "$1");
+}
+
+/* The words in a phrase that actually do the distinguishing. */
+function significantTerms(text) {
+  return words(text).filter(function (w) {
+    return w.length > 3 &&
+      GENERIC_VERBS.indexOf(w) === -1 &&
+      VAGUE_NOUNS.indexOf(w) === -1 &&
+      EMPTY_MODIFIERS.indexOf(w) === -1 &&
+      STOPWORDS.indexOf(w) === -1;
+  });
+}
 
 /* Person-role suffixes. Used only to decide whether a phrase names a group of
    people, which is how we spot two audiences wearing one sentence. */
@@ -123,11 +174,30 @@ function checkAudience(raw) {
 
   /* A bare vague noun with nothing narrowing it. */
   const bareNouns = VAGUE_NOUNS.filter((n) => ws.includes(n));
-  const qualifierCount = ws.length - bareNouns.length;
+  const emptyMods = EMPTY_MODIFIERS.filter((m) => ws.includes(m));
+  /* An adjective that excludes nobody is not a qualifier, so it doesn't earn credit here. */
+  const qualifierCount = ws.length - bareNouns.length - emptyMods.length;
   if (bareNouns.length && qualifierCount < 3) {
     issues.push({
       kind: "vague-noun",
       message: '"' + bareNouns[0] + '" on its own describes millions of people. What kind, at what moment?',
+    });
+  }
+
+  if (emptyMods.length) {
+    issues.push({
+      kind: "empty-modifier",
+      message: '"' + emptyMods[0] + '" excludes nobody — nobody describes their own company as '
+        + 'un' + emptyMods[0].replace(/^un/, "") + '. Cut it and see what is left.',
+    });
+  }
+
+  const stock = STOCK_AUDIENCES.filter(function (a) { return lower.indexOf(a) !== -1; });
+  if (stock.length && ws.length < 8) {
+    issues.push({
+      kind: "stock",
+      message: '"' + stock[0] + '" is one of the most common answers there is. It is not wrong, '
+        + 'it is just not yours yet.',
     });
   }
 
@@ -202,6 +272,73 @@ function checkChange(before, after) {
   return { pass: true, message: "" };
 }
 
+/* The dull test.
+
+   Godin's real question: would the people you deliberately excluded find this boring?
+   If they would happily read your copy, you did not actually narrow — you just wrote a
+   nicer version of "for everyone".
+
+   Takes the copy, the audience sentence, and the excluded group. Entirely local: it
+   compares which distinguishing words survive into the copy, and looks for the language
+   that appeals to everybody. */
+function dullTest(copy, audience, excluded) {
+  var text = (copy || "").trim();
+  if (!text) return { level: "empty", findings: [], hits: [] };
+
+  var lower = text.toLowerCase();
+  var copyWords = words(text);
+  var aTerms = significantTerms(audience || "");
+  var eTerms = significantTerms(excluded || "");
+
+  var copyStems = copyWords.map(stem);
+  var inCopy = function (t) { return copyStems.indexOf(stem(t)) !== -1; };
+
+  var hits = aTerms.filter(inCopy);
+  var exclHits = eTerms.filter(inCopy);
+  /* Word-exact, not substring — "top" must not match inside "stop". */
+  var mods = EMPTY_MODIFIERS.filter(function (m) { return copyWords.indexOf(m) !== -1; });
+  var hedge = HEDGES.find(function (h) { return lower.indexOf(h) !== -1; });
+  var stock = STOCK_AUDIENCES.filter(function (a) { return lower.indexOf(a) !== -1; });
+
+  var findings = [];
+
+  if (!hits.length && aTerms.length) {
+    findings.push("Nothing here names the person you chose. Not one of " +
+      aTerms.slice(0, 3).map(function (t) { return '"' + t + '"'; }).join(", ") +
+      " survived into this copy.");
+  }
+  if (exclHits.length) {
+    findings.push('This speaks to the group you excluded — "' + exclHits[0] +
+      '" is their word, not your audience\'s.');
+  }
+  if (hedge) {
+    findings.push('"' + hedge + '" puts everyone back in the room, after you spent ten minutes ' +
+      "getting them out of it.");
+  }
+  if (mods.length) {
+    findings.push('"' + mods[0] + '" excludes nobody. Cut it and the sentence means the same thing.');
+  }
+  if (stock.length) {
+    findings.push('"' + stock[0] + '" is the phrase everybody uses.');
+  }
+
+  var generic = mods.length + (hedge ? 1 : 0) + stock.length;
+  var level;
+  if (!hits.length || (generic && hits.length < 2)) level = "dull";
+  else if (generic || hits.length < 2) level = "mixed";
+  else level = "aimed";
+
+  if (level === "aimed") {
+    findings.push("Carries " + hits.length + " of the words that made your audience specific: " +
+      hits.slice(0, 4).map(function (t) { return '"' + t + '"'; }).join(", ") + ".");
+    if (eTerms.length) {
+      findings.push("Nothing in it is aimed at the people you turned away.");
+    }
+  }
+
+  return { level: level, findings: findings, hits: hits };
+}
+
 /* The exclusion answer has a lower bar — it just has to name somebody real. */
 function checkExclusion(raw) {
   const text = (raw || "").trim();
@@ -221,6 +358,7 @@ if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     checkAudience, checkExclusion, checkCost, checkBelief, checkChange,
     checkSubstance, isFiller, looksLikeAudienceNoun, hasBehaviorClause,
-    VAGUE_NOUNS, HEDGES, SITUATION,
+    dullTest, significantTerms, stem,
+    VAGUE_NOUNS, HEDGES, SITUATION, EMPTY_MODIFIERS, STOCK_AUDIENCES,
   };
 }

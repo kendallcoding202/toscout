@@ -57,6 +57,13 @@ Five steps, ten minutes, no signup, nothing leaves the browser.
 
 Out: a Position Card, copyable as Markdown, printable, dated, with a 90-day revisit stamp.
 
+**Then the dull test.** Paste your homepage headline and it checks the copy against the card
+you just made — not whether your audience would like it, but whether the people you excluded
+would find it dull. If they'd read it happily, nothing was narrowed. It compares which of your
+audience's distinguishing words survive into the copy, catches language aimed at the group you
+turned away, and names the adjectives that exclude nobody. No competitor ships a feature whose
+job is to tell you your copy is generic.
+
 **The behavior that makes it a tool rather than a form:** it refuses vague answers, and it
 refuses them *specifically*. Type "creative professionals and agencies" and it says there are
 two audiences in the sentence, that "professionals" describes millions of people, and that

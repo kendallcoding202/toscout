@@ -95,6 +95,10 @@
   .card-out .gave{border-left:2px solid var(--rule);padding-left:14px;margin-top:6px}
   .card-out .gave div{color:var(--muted);font-size:15px;margin-bottom:7px}
   .stamp{margin-top:26px;padding-top:16px;border-top:1px solid var(--rule2);font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.05em}
+  .dull{margin-top:44px;padding-top:32px;border-top:1px solid var(--rule)}
+  .dull textarea{min-height:90px}
+  .verdict.mid{background:#fdf6ea;border:1px solid rgba(180,130,40,.3)}
+  .verdict.mid .head{color:#8a6410}
   footer{margin-top:60px;padding-top:24px;border-top:1px solid var(--rule);color:var(--muted);font-size:13.5px}
   .hidden{display:none}
   .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--paper);
@@ -207,6 +211,16 @@
       <button class="primary" id="copy">Copy as Markdown</button>
       <button class="ghost" id="print">Print</button>
       <button class="ghost" id="restart">Start over</button>
+    </div>
+
+    <div class="dull">
+      <div class="step-n" style="margin-top:0">The dull test</div>
+      <h2>Now check your copy against it.</h2>
+      <p class="lead">Paste your homepage headline, or the first line of your launch email.
+      The question isn't whether your audience likes it — it's whether the people you just
+      turned away would find it dull. If they'd read it happily, you didn't narrow anything.</p>
+      <textarea id="copyText" placeholder="We help ambitious teams scale faster."></textarea>
+      <div id="dullVerdict"></div>
     </div>
   </section>
 
@@ -547,6 +561,42 @@
 
   $("finish").addEventListener("click", function () { renderCard(); show(6); });
 
+  /* ---------------------------------------------------------- the dull test */
+  var DULL_COPY = {
+    dull:  ["good", "This could be anyone's copy",
+            "The people you excluded would read this quite happily. That means it isn't positioning yet."],
+    mixed: ["mid", "Halfway there",
+            "Some of your audience survives into this, but it's still reaching for people you decided to let go."],
+    aimed: ["good", "This is aimed at the person you chose",
+            "Someone outside your audience would find this dull. That is exactly what you want."],
+  };
+
+  function renderDull() {
+    var box = $("dullVerdict");
+    var res = window.dullTest($("copyText").value, state.sentence, state.excl);
+    if (res.level === "empty") { box.innerHTML = ""; state.copyText = ""; save(); return; }
+
+    var spec = DULL_COPY[res.level];
+    var div = document.createElement("div");
+    div.className = "verdict " + (res.level === "dull" ? "bad" : spec[0]);
+    var head = document.createElement("div");
+    head.className = "head"; head.textContent = spec[1];
+    div.appendChild(head);
+    var lead = document.createElement("p");
+    lead.style.margin = "8px 0 0"; lead.textContent = spec[2];
+    div.appendChild(lead);
+    if (res.findings.length) {
+      var ul = document.createElement("ul");
+      res.findings.forEach(function (f) {
+        var li = document.createElement("li"); li.textContent = f; ul.appendChild(li);
+      });
+      div.appendChild(ul);
+    }
+    box.innerHTML = ""; box.appendChild(div);
+    state.copyText = $("copyText").value; save();
+  }
+  $("copyText").addEventListener("input", renderDull);
+
   function copyText(text, msg) {
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(text).then(
@@ -588,6 +638,8 @@
   if (state.step >= 4) checkSentence();
   if (state.step >= 5) syncFinal();
   if (state.step === 6) renderCard();
+  $("copyText").value = state.copyText || "";
+  if (state.copyText) renderDull();
   show(Math.min(state.step || 1, 6));
 })();
 </script>

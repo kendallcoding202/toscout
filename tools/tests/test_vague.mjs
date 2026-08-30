@@ -5,8 +5,8 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { checkAudience, checkExclusion, checkCost, checkBelief, checkChange, isFiller } =
-  require("../vague.js");
+const { checkAudience, checkExclusion, checkCost, checkBelief, checkChange, isFiller,
+        dullTest } = require("../vague.js");
 
 const REJECTED = [
   ["small businesses", "bare vague noun, no moment"],
@@ -152,4 +152,73 @@ test("filler is detected by shape, not by a blocklist", () => {
 test("empty fields stay silent rather than shouting at someone mid-type", () => {
   assert.equal(checkCost("").message, "", "an untouched field should not show an error");
   assert.equal(checkBelief("").message, "");
+});
+
+/* --- empty modifiers and stock phrases --- */
+
+test("buzzword padding no longer buys specificity", () => {
+  for (const s of [
+    "ambitious B2B SaaS teams who want to scale",
+    "forward-thinking companies that want to grow faster",
+    "high-growth startups looking to win",
+  ]) {
+    assert.equal(checkAudience(s).pass, false, `${JSON.stringify(s)} excludes nobody`);
+  }
+});
+
+test("an empty modifier is named and inverted back at you", () => {
+  const r = checkAudience("ambitious teams who run their own workshops");
+  const m = r.issues.find(i => i.kind === "empty-modifier");
+  assert.ok(m, "should flag 'ambitious'");
+  assert.match(m.message, /ambitious/);
+});
+
+test("modifier matching is word-exact, not substring", () => {
+  // "top" is in the modifier list and must not match inside "stop"
+  const r = checkAudience("founders who stop halfway through positioning");
+  assert.equal(r.issues.filter(i => i.kind === "empty-modifier").length, 0);
+});
+
+test("the most common answers are called out as common", () => {
+  const r = checkAudience("small business owners");
+  assert.ok(r.issues.some(i => i.kind === "stock"), "should recognise a stock answer");
+});
+
+/* --- the dull test --- */
+
+const AUD = "consultants about to run a positioning workshop for a new client";
+const EXC = "in-house teams with a PMM already";
+
+test("copy that names nobody specific reads as dull", () => {
+  const r = dullTest("We help ambitious teams scale faster.", AUD, EXC);
+  assert.equal(r.level, "dull");
+  assert.ok(r.findings.some(f => /Nothing here names the person you chose/.test(f)));
+});
+
+test("copy carrying the audience's own words reads as aimed", () => {
+  const r = dullTest(
+    "Positioning workshops that stop halfway. A ten-minute warm-up for consultants running a client session.",
+    AUD, EXC);
+  assert.equal(r.level, "aimed", r.findings.join(" | "));
+});
+
+test("plurals still match — 'workshops' counts as 'workshop'", () => {
+  assert.ok(dullTest("positioning workshops", AUD, EXC).hits.includes("workshop"));
+});
+
+test("copy aimed at the excluded group is caught by name", () => {
+  const r = dullTest("Built for in-house PMM teams at every stage.", AUD, EXC);
+  assert.equal(r.level, "dull");
+  assert.ok(r.findings.some(f => /group you excluded/.test(f)));
+});
+
+test("a hedge downgrades otherwise-aimed copy", () => {
+  const r = dullTest("A positioning warm-up for anyone who runs workshops.", AUD, EXC);
+  assert.notEqual(r.level, "aimed");
+  assert.ok(r.findings.some(f => /anyone/.test(f)));
+});
+
+test("empty copy is silent, not a verdict", () => {
+  assert.equal(dullTest("", AUD, EXC).level, "empty");
+  assert.deepEqual(dullTest("   ", AUD, EXC).findings, []);
 });
