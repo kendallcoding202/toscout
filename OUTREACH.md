@@ -145,6 +145,70 @@ match on the list.
 
 Note the example input is generic on purpose. Do not quote her own homepage back at her.
 
+##### Version B — the CopyTribe angle (recommended of the two)
+
+She also founded **CopyTribe**, a 7-month copywriting certification with 550+ graduates, run in
+cohorts, with mentors giving feedback on assignments. Its second half is called *The Profitable
+Freelancer* — where students are told to pick a niche.
+
+**Send this one instead of the workshop version**, for two reasons. It is a cheaper yes: showing
+students a free tool costs her nothing, while forwarding one to a paying client puts her name on
+it. And the upside is larger — one yes reaches a cohort rather than one client.
+
+> **Subject: students who pick a niche vs. students who give one up**
+>
+> Hi Michal —
+>
+> In the Profitable Freelancer half of CopyTribe: how many students pick a niche because
+> they've been told to, and how many actually give the other ones up? Those look identical on
+> an assignment and they aren't the same thing at all. Only the second kind survives a month
+> of no enquiries.
+>
+> There's a free tool that forces the second kind. It makes them list every audience they think
+> they could serve, keep exactly one, and write down what they're losing by dropping each of
+> the others. It won't let them finish until the sentence excludes somebody — type "small
+> business owners" and it simply says no:
+>
+> > *"small business owners" is one of the most common answers there is. It is not wrong, it is
+> > just not yours yet.*
+>
+> Coming from a mentor, that's an opinion, and students argue with opinions. Coming from a page
+> that won't advance, it's a wall.
+>
+> Ten minutes, no signup, nothing leaves their browser:
+> https://kendallcoding202.github.io/toscout/pickone.html
+>
+> The blunt answer is the useful one: would you put this in front of a cohort, or does the
+> pushback need to come from a person? If it's the latter I'd rather hear that than guess.
+>
+> — [you]
+>
+> Nothing to buy, no pitch behind it.
+
+The quoted rejection is real output — run "small business owners" through the tool and it says
+exactly that. Do not paraphrase it in the email; if she tries it and the wording differs, the
+one thing this product sells is precision.
+
+##### Choosing between them
+
+| Send version A (the workshop) if | Send version B (CopyTribe) if |
+|---|---|
+| You want her as a paying customer for the tool | You want reach and a first yes |
+| The client-deliverable framing is the bet | The teaching-aid framing is the bet |
+
+Only send one. If she replies to either, the other angle is a natural follow-up in the same
+thread rather than a second cold email.
+
+##### Reaching her
+
+Her contact page at `michaleisik.com/contact` has a form, and LinkedIn is
+`linkedin.com/in/michaleisikowitz/` — her full name is Michal Eisikowitz.
+
+**Do not use ZoomInfo or RocketReach**, both of which list her with a masked address, and do not
+complete the pattern from the mask. That is broker-aggregated data rather than an address she
+published to be contacted at, and "I found you on RocketReach" is a poor first line to a
+copywriter. Her own form exists for exactly this.
+
 #### Inflection Studio
 
 Sells a *5-day positioning sprint*, plus a 4-week GTM Foundation Sprint and ongoing PMM from
