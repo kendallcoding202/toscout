@@ -151,6 +151,57 @@ function checkAudience(raw) {
   return { pass: issues.length === 0, score, issues, strengths };
 }
 
+/* Placeholder text: filler people type to get past a gate. This can't defeat someone
+   determined to lie to themselves with real-looking words, and it isn't meant to — it
+   exists to stop the lazy answer, which is the common case. */
+function isFiller(text) {
+  var ws = words(text);
+  if (!ws.length) return true;
+  return ws.every(function (w) {
+    return !/[aeiouy]/.test(w) || /^(.)\1+$/.test(w);
+  });
+}
+
+var NOTHING = /^(nothing|nothing much|none|no ?one|nobody|n\/a|na|idk|dunno|tbd|\?+)$/i;
+
+/* Generic substance gate, used by every field that isn't the audience sentence.
+   Returns { pass, message }. */
+function checkSubstance(raw, minWords, message) {
+  var text = (raw || "").trim();
+  if (!text) return { pass: false, message: "" };          // empty is silent, not an error
+  if (NOTHING.test(text)) {
+    return { pass: false, message: "\u201c" + text + "\u201d is the answer that makes this exercise pointless." };
+  }
+  if (isFiller(text)) return { pass: false, message: "That isn't an answer yet." };
+  if (words(text).length < minWords) return { pass: false, message: message };
+  return { pass: true, message: "" };
+}
+
+/* What you lose by dropping an audience. Vague here and the decision won't hold. */
+function checkCost(raw) {
+  return checkSubstance(raw, 3,
+    "Name what you actually lose — a client, a revenue line, a referral source. Three words minimum.");
+}
+
+/* The worldview. Has to be a claim, not a word. */
+function checkBelief(raw) {
+  return checkSubstance(raw, 4,
+    "That's not a belief yet. What do they think is true that most people don't?");
+}
+
+/* Before and after. If they're the same, there is no product. */
+function checkChange(before, after) {
+  var b = checkSubstance(before, 3, "Say who they are before, in a few words.");
+  if (!b.pass) return { pass: false, message: b.message, field: "before" };
+  var a = checkSubstance(after, 3, "Say who they are after, in a few words.");
+  if (!a.pass) return { pass: false, message: a.message, field: "after" };
+  if ((before || "").trim().toLowerCase() === (after || "").trim().toLowerCase()) {
+    return { pass: false, field: "after",
+             message: "Before and after are identical. If nothing changes, there is nothing to sell." };
+  }
+  return { pass: true, message: "" };
+}
+
 /* The exclusion answer has a lower bar — it just has to name somebody real. */
 function checkExclusion(raw) {
   const text = (raw || "").trim();
@@ -161,13 +212,15 @@ function checkExclusion(raw) {
   }
   const hedge = HEDGES.find((h) => text.toLowerCase().includes(h));
   if (hedge) return { pass: false, message: '"' + hedge + '" is not an exclusion.' };
+  if (isFiller(text)) return { pass: false, message: "That isn't a group of people." };
   if (ws.length < 2) return { pass: false, message: "Two words minimum. Who, specifically, are you turning away?" };
   return { pass: true, message: "" };
 }
 
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
-    checkAudience, checkExclusion, looksLikeAudienceNoun, hasBehaviorClause,
+    checkAudience, checkExclusion, checkCost, checkBelief, checkChange,
+    checkSubstance, isFiller, looksLikeAudienceNoun, hasBehaviorClause,
     VAGUE_NOUNS, HEDGES, SITUATION,
   };
 }

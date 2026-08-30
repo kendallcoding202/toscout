@@ -39,6 +39,8 @@
   textarea{min-height:130px;resize:vertical}
   label{display:block;font-weight:600;margin-bottom:6px;font-size:15px}
   .hint{color:var(--muted);font-size:14px;margin-bottom:16px}
+  .note{color:var(--red);font-size:13.5px;margin-top:6px;min-height:1px}
+  .cut-row .note{margin-top:5px}
 
   button{font-family:inherit;font-size:15px;font-weight:600;border-radius:7px;padding:11px 20px;cursor:pointer;border:1px solid transparent}
   .primary{background:var(--red);color:#fff}
@@ -178,11 +180,14 @@
     <label for="belief" style="margin-top:22px">What do they believe that most people don't?</label>
     <div class="hint">The worldview you're joining, not one you have to install.</div>
     <input type="text" id="belief" placeholder="that charging properly is a skill, not a personality trait">
+    <div class="note" id="beliefNote"></div>
 
     <label for="before" style="margin-top:22px">The person before</label>
     <input type="text" id="before" placeholder="undercharging and quietly resentful about it">
+    <div class="note" id="beforeNote"></div>
     <label for="after" style="margin-top:14px">The person after</label>
     <input type="text" id="after" placeholder="quoting a number without flinching">
+    <div class="note" id="afterNote"></div>
 
     <div class="actions">
       <button class="primary" id="finish" disabled>Write the card</button>
@@ -367,8 +372,17 @@
         var gi = document.createElement("input");
         gi.type = "text"; gi.value = c.giveUp || "";
         gi.placeholder = "What are you giving up by letting this one go?";
-        gi.addEventListener("input", function () { c.giveUp = gi.value; save(); syncCut(); });
-        give.appendChild(gi); body.appendChild(give);
+        gi.addEventListener("input", function () {
+          c.giveUp = gi.value; save();
+          note.textContent = window.checkCost(gi.value).message;
+          syncCut();
+        });
+        give.appendChild(gi);
+        var note = document.createElement("div");
+        note.className = "note";
+        note.textContent = window.checkCost(c.giveUp).message;
+        give.appendChild(note);
+        body.appendChild(give);
       }
       el.appendChild(body);
 
@@ -386,7 +400,7 @@
 
   function syncCut() {
     var others = state.candidates.filter(function (c) { return c.id !== state.keptId; });
-    var allGiven = others.every(function (c) { return (c.giveUp || "").trim().length > 2; });
+    var allGiven = others.every(function (c) { return window.checkCost(c.giveUp).pass; });
     $("to3") && ($("to3").disabled = false);
     $("to4").disabled = !state.keptId || !allGiven;
   }
@@ -465,10 +479,12 @@
       }
       box.innerHTML = ""; box.appendChild(div);
     }
-    var filled = ["belief", "before", "after"].every(function (k) {
-      return $(k).value.trim().length > 2;
-    });
-    $("finish").disabled = !(ex.pass && filled);
+    var belief = window.checkBelief($("belief").value);
+    var change = window.checkChange($("before").value, $("after").value);
+    $("beliefNote").textContent = belief.message;
+    $("beforeNote").textContent = change.field === "before" ? change.message : "";
+    $("afterNote").textContent = change.field === "after" ? change.message : "";
+    $("finish").disabled = !(ex.pass && belief.pass && change.pass);
   }
   ["excl", "belief", "before", "after"].forEach(function (k) {
     $(k).addEventListener("input", syncFinal);

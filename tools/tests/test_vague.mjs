@@ -5,7 +5,8 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 
 const require = createRequire(import.meta.url);
-const { checkAudience, checkExclusion } = require("../vague.js");
+const { checkAudience, checkExclusion, checkCost, checkBelief, checkChange, isFiller } =
+  require("../vague.js");
 
 const REJECTED = [
   ["small businesses", "bare vague noun, no moment"],
@@ -110,4 +111,45 @@ test("the too-short message states the real threshold", () => {
   const r = checkAudience("positioning consultants");
   const msg = r.issues.find(i => i.kind === "short").message;
   assert.ok(msg.startsWith("Three words or fewer"), "the check fires at 3 or fewer, so say three");
+});
+
+/* --- substance gates: the tool was rigorous at step 4 and lenient everywhere else --- */
+
+
+test("a stated cost has to name something real", () => {
+  for (const bad of ["xxx", "asd", "nothing", "none", "n/a", "tbd", "?", "a bit"]) {
+    assert.equal(checkCost(bad).pass, false, `should reject ${JSON.stringify(bad)}`);
+  }
+  assert.equal(checkCost("the referral pipeline that came with them").pass, true);
+  assert.equal(checkCost("about 4k a month in retainer").pass, true);
+});
+
+test("'nothing' gets called out rather than silently rejected", () => {
+  assert.match(checkCost("nothing").message, /pointless/);
+});
+
+test("a belief has to be a claim, not a word", () => {
+  for (const bad of ["asd", "quality", "growth", "they want more"]) {
+    assert.equal(checkBelief(bad).pass, false, `should reject ${JSON.stringify(bad)}`);
+  }
+  assert.equal(checkBelief("that pricing is a skill, not a personality trait").pass, true);
+});
+
+test("before and after must differ — no change, no product", () => {
+  const same = checkChange("undercharging and quietly resentful", "undercharging and quietly resentful");
+  assert.equal(same.pass, false);
+  assert.match(same.message, /identical/);
+  assert.equal(checkChange("undercharging and resentful about it", "quoting a number without flinching").pass, true);
+});
+
+test("filler is detected by shape, not by a blocklist", () => {
+  for (const f of ["xxx", "qq ww", "zzzz", "hjkl"]) {
+    assert.equal(isFiller(f), true, `${JSON.stringify(f)} should read as filler`);
+  }
+  assert.equal(isFiller("the referral pipeline"), false);
+});
+
+test("empty fields stay silent rather than shouting at someone mid-type", () => {
+  assert.equal(checkCost("").message, "", "an untouched field should not show an error");
+  assert.equal(checkBelief("").message, "");
 });

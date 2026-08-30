@@ -89,6 +89,41 @@ await p.fill('#sentence', 'creative professionals and agencies');
 if (!await p.isDisabled('#to5')) throw new Error('two-audience sentence should block');
 console.log('✓ rejection path holds from a clean slate');
 
+/* The tool used to be strict at step 4 and lenient everywhere else, so a card could be
+   produced from filler. Every gate is checked here, not just the audience sentence. */
+await p.evaluate(() => localStorage.clear());
+await p.goto(PAGE);
+await p.fill('#dump', 'aaa\nbbb\nccc');
+await p.click('#to2'); await p.click('#to3');
+await p.locator('.cut-row').first().locator('button').click();
+const filler = p.locator('.cut-row .give input');
+for (let i = 0; i < await filler.count(); i++) await filler.nth(i).fill('xxx');
+if (!await p.isDisabled('#to4')) throw new Error('filler must not pass as a stated cost');
+for (let i = 0; i < await filler.count(); i++) await filler.nth(i).fill('nothing');
+if (!await p.isDisabled('#to4')) throw new Error('"nothing" must not pass as a stated cost');
+for (let i = 0; i < await filler.count(); i++) {
+  await filler.nth(i).fill('the referral pipeline that came with them');
+}
+if (await p.isDisabled('#to4')) throw new Error('a real cost should unblock');
+console.log('✓ step 3 rejects filler and "nothing" as a stated cost');
+
+await p.click('#to4');
+await p.fill('#sentence', 'consultants who run positioning workshops');
+await p.click('#to5');
+await p.fill('#excl', 'qq ww');
+await p.fill('#belief', 'asd');
+await p.fill('#before', 'asd');
+await p.fill('#after', 'asd');
+if (!await p.isDisabled('#finish')) throw new Error('filler must not produce a card');
+await p.fill('#excl', 'agencies with an in-house team');
+await p.fill('#belief', 'that pricing is a skill, not a personality trait');
+await p.fill('#before', 'undercharging and quietly resentful');
+await p.fill('#after', 'undercharging and quietly resentful');
+if (!await p.isDisabled('#finish')) throw new Error('identical before/after must block');
+await p.fill('#after', 'quoting a number without flinching');
+if (await p.isDisabled('#finish')) throw new Error('real answers should unblock');
+console.log('✓ step 5 rejects filler and an unchanged before/after');
+
 await b.close();
 if (errs.length) { console.error('\nJS ERRORS:\n' + errs.join('\n')); process.exit(1); }
 console.log('\nAll checks passed, no JS errors.');
