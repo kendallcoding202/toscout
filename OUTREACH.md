@@ -87,6 +87,13 @@ about *them*, and the ask is one question they can answer in four words.
 Verify each person's current offering before sending — these were assembled from search
 results and the details may have moved.
 
+### The link
+
+    https://kendallcoding202.github.io/toscout/pickone.html
+
+Send the tool, not the landing page. The message already explains what it is, and every extra
+click costs a completion — which is the only number stage 1 measures. One link per email.
+
 #### Michal Eisik — send this one first
 
 Sells a *90-minute positioning workshop* and delivers a *1–3 page Positioning & Messaging
@@ -99,16 +106,16 @@ match on the list.
 > brief. I built a free tool that runs that kind of session and produces that kind of
 > document, and I'd rather hear from someone who does this for a living than keep guessing.
 >
-> It's called Pick One. Ten minutes, no signup, runs entirely in the browser. Its one trick is
-> that it refuses vague answers and says why. Type "B2B SaaS and tech companies" and it comes
-> back with:
+> It's called Pick One. Ten minutes, no signup, runs entirely in the browser — nothing is
+> stored anywhere but your own tab. Its one trick is that it refuses vague answers and says
+> why. Type "B2B SaaS and tech companies" and it comes back with:
 >
 > > *Nothing here says what makes them different from everyone else with that job title. Give
 > > them a moment, a constraint, or something they actually do.*
 >
 > — and it won't let you continue until the sentence excludes somebody.
 >
-> [link]
+> https://kendallcoding202.github.io/toscout/pickone.html
 >
 > One question, and a blunt answer is the useful one: would you ever put this in front of a
 > client before a workshop, or would it get in the way? If it gets in the way I'd like to know
@@ -132,7 +139,7 @@ about £5k/month.
 > dropping the others.
 >
 > It refuses vague answers and won't advance until the sentence excludes somebody. Ten minutes,
-> no signup: [link]
+> no signup: https://kendallcoding202.github.io/toscout/pickone.html
 >
 > Would this save you an hour on day one, or is the argument the part clients need to have with
 > a human in the room? Genuinely asking — if it's the latter, that's the answer.
@@ -148,7 +155,8 @@ positioning frameworks publicly. Higher tier, and the most likely to share it if
 > probably seen every version of "we help ambitious teams" there is.
 >
 > I built a free tool that refuses those sentences and says specifically what's wrong with them.
-> No AI, just pattern matching on the ways vagueness shows up. Ten minutes, no signup: [link]
+> No AI, just pattern matching on the ways vagueness shows up. Ten minutes, no signup:
+> https://kendallcoding202.github.io/toscout/pickone.html
 >
 > One question: what's the vaguest audience sentence it should catch and doesn't? I'd rather
 > find the holes from someone who's seen a few hundred of them.
